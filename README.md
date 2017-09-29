@@ -12,72 +12,72 @@ Provide backend calculations of important data for use in WebApp and mobile Apps
 
 # Documentation:
 
-##userLocation
+* userLocation
 `userLocation() -> tuple(lon, lat)`
 
 Returns a tuple representing user location.
 
-###getTime
+* getTime
 `getTime() -> Datetime`
 
 Returns datetime element of current time.
 
-####getSatLonLatAlt
+* getSatLonLatAlt
 `getSatLonLatAlt() -> tuple(lon, lat, alt)`
 
 Returns a tuple representing satellite position.
 
-#####getSatLongitude
+* getSatLongitude
 `getSatLongitude() -> number(deg)`
 
 Returns satellite longitude in degree.
 
-######getSatLatitude
+* getSatLatitude
 `getSatLatitude() -> number(deg)`
 
 Returns satellite latitude in degree.
 
-######getSatAltitude
+* getSatAltitude
 `getSatAltitude() -> number(km)`
 
 Returns satellite altitude in km.
 
-######getSatVelocityVector
+* getSatVelocityVector
 `getSatVelocityVector() -> tuple(vx, vy, vz)`
 
 Returns satellite velocity vector in km/s.
 
-######getSatVelocity
+* getSatVelocity
 `getSatVelocity() -> number(km/s)`
 
 Returns satellite velocity in km/s.
 
-######getAzEl
+* getAzEl
 `getAzEl() -> tuple(azimuth, elevation))`
 
 Returns a tuple representing relative direction and elevation of satellite to user.
 
-######getAzimuth
+* getAzimuth
 `getAzimuth() -> number(deg)`
 
 Returns azimuth relative to the user in degree.
 
-######getElevation
+* getElevation
 `getElevation() -> number(deg))`
 
 Returns elevation relative to the user in degree.
 
-######getRADec
+* getRADec
 `getRADec() -> tuple(right ascension, declination)`
 
 Returns elevation relative to the user.
 
-######getRA
+* getRA
 `getRADec() -> number(deg)`
 
 Returns right ascension of the satellite in degree.
 
-######getDec
+* getDec
 `getRADec() -> number(deg)`
 
 Returns declination of the satellite in degree.  
