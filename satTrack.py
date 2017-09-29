@@ -1,7 +1,8 @@
 from pyorbital import tlefile
 from datetime import datetime
 from pyorbital.orbital import Orbital
-from getLocation import getLoc
+from getLocation import getUserLoc
+from getLocation import getISSLoc
 from math import sqrt
 
 satellite = "ISS"
@@ -9,7 +10,7 @@ filepath = "stations.txt"
 orb = Orbital(satellite, filepath)
 
 def userLocation(user):
-	return getLoc()
+	return getUserLoc()
 
 # normPos = orb.get_position(now, normalize=False)
 # print("Normalized position and velocity of satellite: " + str(normPos))
