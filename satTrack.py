@@ -9,7 +9,7 @@ from getLocation import getLoc
 
 #read in TLE for ISS
 satellite = "ISS"
-filepath = ""
+filepath = "stations.txt"
 orb = Orbital(satellite, filepath)
 now = datetime.utcnow()
 normPos = orb.get_position(now)
