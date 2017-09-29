@@ -12,7 +12,7 @@ Provide backend calculations of important data for use in WebApp and mobile Apps
 
 # Documentation:
 
-######userLocation
+###userLocation
 `userLocation() -> tuple(lon, lat)`
 
 Returns a tuple representing user location.
@@ -45,7 +45,7 @@ Returns satellite altitude in km.
 ######getSatVelocityVector
 `getSatVelocityVector() -> tuple(vx, vy, vz)`
 
-Returns satellite velocity vector in km/s. 
+Returns satellite velocity vector in km/s.
 
 ######getSatVelocity
 `getSatVelocity() -> number(km/s)`
