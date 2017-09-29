@@ -17,9 +17,15 @@ def userLocation(user):
 # print("My Longitude: " + str(myLon))
 
 #returns velocity of satellite in array (x y z)
+def getVelocityVector():
+	normPos = orb.get_position(now, normalize=False)
+	vel = normPos[1]
+	print("Velocity vector: " + str(vel))
+	return vel
+
 def getVelocity():
-	pass
-	#Need FIXING
+	v = sqrt(sum(map(lambda x: x**2, getVelocityVector())))
+	return v
 
 #returns angle of satellite relative to your position as tuple: (azimuth, elevation)
 def getAzEl():

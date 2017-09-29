@@ -42,6 +42,11 @@ Returns satellite latitude in degree.
 
 Returns satellite altitude in km.
 
+######getSatVelocityVector
+`getSatVelocityVector() -> tuple(vx, vy, vz)`
+
+Returns satellite velocity vector in km/s. 
+
 ######getSatVelocity
 `getSatVelocity() -> number(km/s)`
 
