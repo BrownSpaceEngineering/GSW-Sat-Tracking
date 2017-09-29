@@ -12,22 +12,22 @@ Provide backend calculations of important data for use in WebApp and mobile Apps
 
 # Documentation:
 
-###userLocation
+##userLocation
 `userLocation() -> tuple(lon, lat)`
 
 Returns a tuple representing user location.
 
-######getTime
+###getTime
 `getTime() -> Datetime`
 
 Returns datetime element of current time.
 
-######getSatLonLatAlt
+####getSatLonLatAlt
 `getSatLonLatAlt() -> tuple(lon, lat, alt)`
 
 Returns a tuple representing satellite position.
 
-######getSatLongitude
+#####getSatLongitude
 `getSatLongitude() -> number(deg)`
 
 Returns satellite longitude in degree.
