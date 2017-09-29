@@ -35,6 +35,9 @@ def getSatLonLatAlt():
 	print("Lon, lat, alt: " + str(lonlatalt))
 	return lonlatalt
 
+def returnTime():
+	return now
+
 # def getNextPasses():
 # 	nextPasses = orb.get_next_passes(now, 2, myLon, myLat, myAlt, tol=0.0001, horizon=0)
 # 	print ("Next passes: " + str(nextPasses))
@@ -43,4 +46,5 @@ def getSatLonLatAlt():
 getVelocity()
 getAngle()
 getSatLonLatAlt()
+returnTime()
 # getNextPasses()
