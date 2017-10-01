@@ -95,3 +95,6 @@ Returns right ascension of the satellite in degree.
 `getRADec() -> number(deg)`
 
 Returns declination of the satellite in degree.  
+* nextPass
+`nextPass() -> tuple(rise time, rise azimuth, maximum altitude time, maximum altitude, set time, set azimuth)
+Returns information about the next visible pass of the satellite over the observing location
