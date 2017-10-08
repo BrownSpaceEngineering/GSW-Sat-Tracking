@@ -1,13 +1,13 @@
 import ephem
 import json
 LAT = "41:50"
-##Latitude +North
+# Latitude +North
 LON = "-71:25"
-##Longitude +East
+# Longitude +East
 ELEV = 50
-##Elevation in meters
-##DATE = 
-##Date defaults to now()
+# Elevation in meters
+# DATE =
+# Date defaults to now()
 
 location = ephem.Observer()
 location.lon = LON
@@ -22,13 +22,13 @@ print(sat)
 
 def nextPass(location, body):
 	passData = location.next_pass(body)
-	##next_pass returns a six-element tuple giving:
-	##0  Rise time
-	##1  Rise azimuth
-	##2  Maximum altitude time
-	##3  Maximum altitude
-	##4  Set time
-	##5  Set azimuth
+	# next_pass returns a six-element tuple giving:
+	# 0  Rise time
+	# 1  Rise azimuth
+	# 2  Maximum altitude time
+	# 3  Maximum altitude
+	# 4  Set time
+	# 5  Set azimuth
 	d = {
 	'rise_time': passData[0],
 	'rise_azimuth': passData[1],
@@ -36,7 +36,7 @@ def nextPass(location, body):
 	'max_alt': passData[3],
 	'set_time': passData[4],
 	'set_azimuth': passData[5]
-	}	
+	}
 	return json.dumps(d)
 
 passData = nextPass(location, sat)
