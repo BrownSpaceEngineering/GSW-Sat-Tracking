@@ -20,31 +20,31 @@ Returns a tuple representing user location.
 
 * getTime
 
-`getTime() -> Datetime`
+`getTime() -> {"time":<time>}`
 
-Returns datetime element of current time.
+Returns datetime element parsed into stringof current time.
 
 * getSatLonLatAlt
 
-`getSatLonLatAlt() -> tuple(lon, lat, alt)`
+`getSatLonLatAlt() -> {"loc":tuple(lon, lat, alt)}`
 
 Returns a tuple representing satellite position.
 
 * getSatLongitude
 
-`getSatLongitude() -> number(deg)`
+`getSatLongitude() -> {"lon":<lon>}`
 
 Returns satellite longitude in degree.
 
 * getSatLatitude
 
-`getSatLatitude() -> number(deg)`
+`getSatLatitude() -> {"lat":<lat>}`
 
 Returns satellite latitude in degree.
 
 * getSatAltitude
 
-`getSatAltitude() -> number(km)`
+`getSatAltitude() -> {"alt":<alt>}`
 
 Returns satellite altitude in km.
 
@@ -62,27 +62,27 @@ Returns satellite velocity in km/s.
 
 * getAzEl
 
-`getAzEl() -> tuple(azimuth, elevation))`
+`getAzEl() -> {"az":<azimuth>,"el":<elevation>}`
 
 Returns a tuple representing relative direction and elevation of satellite to user.
 
 * getAzimuth
 
-`getAzimuth() -> number(deg)`
+`getAzimuth() -> {"az": <azimuth>}`
 
 Returns azimuth relative to the user in degree.
 
 * getElevation
 
-`getElevation() -> number(deg))`
+`getElevation() -> {"el":<elvation>}`
 
 Returns elevation relative to the user in degree.
 
 * getRADec
 
-`getRADec() -> tuple(right ascension, declination)`
+`getRADec() -> {"RA": <ra_value>, "DEC": <dec_value>}`
 
-Returns elevation relative to the user.
+Returns elevation relative to the user as JSON string.
 
 * getRA
 
@@ -95,6 +95,17 @@ Returns right ascension of the satellite in degree.
 `getRADec() -> number(deg)`
 
 Returns declination of the satellite in degree.  
+<<<<<<< HEAD
 * nextPass
 `nextPass() -> tuple(rise time, rise azimuth, maximum altitude time, maximum altitude, set time, set azimuth)
 Returns information about the next visible pass of the satellite over the observing location
+=======
+
+* nextPass
+
+'nextPass(location, body) -> {'rise_time':<rise_time>,'rise_azimuth': <rise_azimuth>,'max_alt_time':<max_alt_time>,"max_alt":<max_alt>,"set_time":<set_time>,"set_azimuth":<set_azimuth>}
+
+* getVelocityVector
+
+'getVelocityVector() -> {'velocity_vector': <velocity_vector>}'
+>>>>>>> d76f2b4a386f538eb9166f37b45acf39917e01de
