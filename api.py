@@ -71,4 +71,4 @@ def next_pass_default():
     return track.Observer().get_next_pass()
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=80)
+    app.run(debug = False, host = '0.0.0.0', port = 80)
