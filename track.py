@@ -53,7 +53,8 @@ class Tracker:
         normPos = self.orb.get_position(self._time(self), normalize=False)
         vel = normPos[1]
         v = sqrt(sum(map(lambda x: x**2, vel)))
-        return v
+        d = {'velocity': v}
+        return json.dumps(d)
 
     def get_lonlatalt(self):
         lonlatalt = self.orb.get_lonlatalt(self._time(self))

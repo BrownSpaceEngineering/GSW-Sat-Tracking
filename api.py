@@ -34,16 +34,16 @@ def velocity_vector(s):
 def velocity_vector_default():
     return track.Tracker().get_velocity_vector()
 
+@app.route('/api/get_velocity')
+def velocity_default():
+    return track.Tracker().get_velocity()
+
 @app.route('/api/get_velocity/<string:s>')
 def velocity(s):
     try:
         return track.Tracker(s).get_velocity()
     except KeyError:
         return sat_not_found
-
-@app.route('/api/get_velocity')
-def velocity_default():
-    return track.Tracker().get_velocity()
 
 @app.route('/api/get_lonlatalt/<string:s>')
 def lonlatalt(s):
