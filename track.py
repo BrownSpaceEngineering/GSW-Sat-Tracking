@@ -35,10 +35,10 @@ from helpers import *
 class Tracker:
     _time = staticmethod(time)
     def_sat = 'ISS (ZARYA)'
-    
+
     def __init__(self, sat = def_sat):
         self.orb = get_orbital(sat)
-    
+
     def get_velocity_vector(self):
         normPos = self.orb.get_position(self._time(self), normalize=False)
         vel = normPos[1]
@@ -48,13 +48,13 @@ class Tracker:
             ('velocity_vector_z', vel[2])
         ])
         return json.dumps(d)
-    
+
     def get_velocity(self):
         normPos = self.orb.get_position(self._time(self), normalize=False)
         vel = normPos[1]
         v = sqrt(sum(map(lambda x: x**2, vel)))
         return v
-    
+
     def get_lonlatalt(self):
         lonlatalt = self.orb.get_lonlatalt(self._time(self))
         d = OrderedDict([
@@ -63,22 +63,22 @@ class Tracker:
             ('altitude', lonlatalt[2])
         ])
         return json.dumps(d)
-    
+
     def get_time(self):
         time = datetime.utcnow()
         d = {'current_time' : time.strftime('%Y-%m-%dT%H:%M:%S')}
         return json.dumps(d)
-        
+
 class Observer:
     _time = staticmethod(time)
     def_sat = 'ISS (ZARYA)'
     ip_loc = get_ip_loc()
-    
+
     def __init__(self, sat = def_sat, loc = ip_loc):
         self.sat = sat
         self.orb = get_orbital(sat)
         self.loc = loc
-    
+
     def get_az_el(self):
         loc = self.loc
         az_el = self.orb.get_observer_look(self._time(self), loc[0], loc[1], loc[2])
@@ -87,7 +87,7 @@ class Observer:
             ('elevation_angle', az_el[1])
         ])
         return json.dumps(d)
-    
+
     def get_next_pass(self):
         tle = get_TLE(self.sat)
         sat = ephem.readtle(tle[0], tle[1], tle[2])
