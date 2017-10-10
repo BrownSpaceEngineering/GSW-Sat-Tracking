@@ -41,7 +41,7 @@ def velocity(s):
     except KeyError:
         return sat_not_found
 
-@app.route('/api/get_velocity_vector')
+@app.route('/api/get_velocity')
 def velocity_default():
     return track.Tracker().get_velocity()
 
