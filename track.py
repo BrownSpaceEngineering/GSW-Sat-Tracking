@@ -6,6 +6,10 @@
 # Author(s):
 
 #   Michael Mao <yicong_mao@brown.edu>
+#   Kevin Du <kevin_du@brown.edu>
+#   Purvi Goel <purvi_goel@brown.edu>
+#   Trevor Houchens <trevor_houchens@brown.edu>
+#   Andrew Wei <andrew_wei1@brown.edu>
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by

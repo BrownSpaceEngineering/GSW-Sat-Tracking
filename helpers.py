@@ -5,20 +5,17 @@ import json
 import urllib
 
 def update_TLE():
-    tle_file = open("tle.txt", "w")
-    # Space Stations
-    url = "https://www.celestrak.com/NORAD/elements/stations.txt"
-    r = urllib.request.urlopen(url)
-    tle_file.write(r.read().decode('utf-8'))
-    # Cubesats
-    url = "https://www.celestrak.com/NORAD/elements/cubesat.txt"
-    r = urllib.request.urlopen(url)
-    tle_file.write(r.read().decode('utf-8'))
-    # Beidou Navigation
-    url = "https://www.celestrak.com/NORAD/elements/beidou.txt"
-    r = urllib.request.urlopen(url)
-    tle_file.write(r.read().decode('utf-8'))
-    tle_file.close()
+    with open('./tle.txt', 'w') as tle_file:
+        # Make file blank
+        tle_file.truncate(0)
+        # Space Stations
+        url = "https://www.celestrak.com/NORAD/elements/stations.txt"
+        r = urllib.request.urlopen(url)
+        tle_file.write(r.read().decode('utf-8'))
+        # Cubesats
+        url = "https://www.celestrak.com/NORAD/elements/cubesat.txt"
+        r = urllib.request.urlopen(url)
+        tle_file.write(r.read().decode('utf-8'))
 
 def get_ip_loc():
     url = 'http://freegeoip.net/json'
@@ -55,3 +52,7 @@ def get_TLE(sat):
 
 def time(self):
     return datetime.utcnow()
+
+if __name__ == '__main__':
+    print("updating tle")
+    update_TLE()
