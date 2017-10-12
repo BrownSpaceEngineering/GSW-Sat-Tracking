@@ -28,7 +28,7 @@ def time():
 
 @api.route('/api/get_velocity_vector/<string:s>')
 def velocity_vector(s):
-	try:
+    try:
     	return track.Tracker(s).get_velocity_vector()
     except KeyError:
     	return sat_not_found
