@@ -104,5 +104,12 @@ def next_pass_with_sat(s):
 def next_pass_default():
     return track.Observer().get_next_pass()
 
+# Maual maintenance
+@api.route('/api/update')
+def update_tle():
+    helpers.update_TLE()
+    time = json.loads(track.Tracker().get_time())["current_time"]
+    return json.dumps({"updated_time": time})
+
 if __name__ == '__main__':
     api.run(debug = False, host = '0.0.0.0', port = 80)
