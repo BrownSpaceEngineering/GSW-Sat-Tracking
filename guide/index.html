@@ -6,7 +6,12 @@
 <p>gets current time</p>
 <p>example json:<br />{"current_time": "2017-11-14T18:51:46"}</p>
 <h3>./api/get_velocity_vector[/SATELLITE]</h3>
-<p>gets velocity vector of SATELLITE in km/s</p>
+<p>gets velocity vector of SATELLITE in km/s<br />The origin at the center of mass of the earth, a point close to the Earth's center of figure
+<br />The Z axis on the line between the north and south poles, with positive values increasing northward (but does not exactly coincide with the Earth's rotational axis)[13]
+<br />The X and Y axes in the plane of the equator
+<br />The X axis passing through extending from 180 degrees longitude at the equator (negative) to 0 degrees longitude (prime meridian) at the equator (positive)
+<br />The Y axis passing through extending from 90 degrees west longitude at the equator (negative) to 90 degrees east longitude at the equator (positive)
+</p>
 <p>example json:<br />{"velocity_vector_x": 4.142431217482311, "velocity_vector_y": -3.683046787698025, "velocity_vector_z": -5.296093950127022}</p>
 <h3>./api/get_velocity[/SATELLITE]</h3>
 <p>gets velocity of SATELLITE in km/s</p>
