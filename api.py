@@ -1,74 +1,115 @@
 import track
 import helpers
 from flask import Flask
-app = Flask(__name__)
+import json
+from werkzeug.routing import FloatConverter as BaseFloatConverter
+
+api = Flask(__name__)
+
+class FloatConverter(BaseFloatConverter):
+    regex = r'-?\d+(\.\d+)?'
+
+# Renew FloatConverter
+api.url_map.converters['float'] = FloatConverter
+
+sat_not_found = "404 - Satellite Not Found"
+guide_path = './guide/index.html'
 
 # API User Guide
-@app.route('/api/')
+@api.route('/api')
 def api_guide():
-    return '<h1>API User Guide</h1>\n<p>This is the user guide</p>'
+    with open(guide_path, 'r') as f:
+        return f.read()
 
 # Trackers
-@app.route('/api/get_time')
+@api.route('/api/get_time')
 def time():
     return track.Tracker().get_time()
-    
-@app.route('/api/get_velocity_vector/<string:s>')
-def velocity_vector():
-    return track.Tracker(s).get_velocity_vector()
-    
-@app.route('/api/get_velocity_vector')
+
+@api.route('/api/get_velocity_vector/<string:s>')
+def velocity_vector(s):
+    try:
+    	return track.Tracker(s).get_velocity_vector()
+    except KeyError:
+    	return sat_not_found
+
+@api.route('/api/get_velocity_vector')
 def velocity_vector_default():
     return track.Tracker().get_velocity_vector()
-    
-@app.route('/api/get_velocity/<string:s>')
-def velocity():
-    return track.Tracker(s).get_velocity()
-    
-@app.route('/api/get_velocity_vector')
+
+@api.route('/api/get_velocity')
 def velocity_default():
     return track.Tracker().get_velocity()
 
-@app.route('/api/get_lonlatalt/<string:s>')
-def lonlatalt():
-    return track.Tracker(s).get_lonlatalt()
-    
-@app.route('/api/get_lonlatalt')
+@api.route('/api/get_velocity/<string:s>')
+def velocity(s):
+    try:
+        return track.Tracker(s).get_velocity()
+    except KeyError:
+        return sat_not_found
+
+@api.route('/api/get_lonlatalt/<string:s>')
+def lonlatalt(s):
+    try:
+        return track.Tracker(s).get_lonlatalt()
+    except KeyError:
+        return sat_not_found
+
+@api.route('/api/get_lonlatalt')
 def lonlatalt_default():
     return track.Tracker().get_lonlatalt()
 
 # Observers
-@app.route('/api/get_az_el/<string:s>/<int:lon>,<int:lat>,<int:alt>')
+@api.route('/api/get_az_el/<string:s>/<float:lon>,<float:lat>,<float:alt>')
 def az_el(lon, lat, alt, s):
-    return track.Observer(sat = s, loc = (lon, lat, alt)).get_az_el()
+    try:
+        return track.Observer(sat = s, loc = (lon, lat, alt)).get_az_el()
+    except KeyError:
+        return sat_not_found
 
-@app.route('/api/get_az_el/<int:lon>,<int:lat>,<int:alt>')
+@api.route('/api/get_az_el/<float:lon>,<float:lat>,<float:alt>')
 def az_el_with_loc(lon, lat, alt):
     return track.Observer(loc = (lon, lat, alt)).get_az_el()
-    
-@app.route('/api/get_az_el/<string:s>')
+
+@api.route('/api/get_az_el/<string:s>')
 def az_el_with_sat(s):
-    return track.Observer(sat = s).get_az_el()
-    
-@app.route('/api/get_az_el')
+    try:
+        return track.Observer(sat = s).get_az_el()
+    except KeyError:
+    	return sat_not_found
+
+@api.route('/api/get_az_el')
 def az_el_default():
     return track.Observer().get_az_el()
-    
-@app.route('/api/get_next_pass/<string:s>/<int:lon>,<int:lat>,<int:alt>')
-def next_pass(lon, lat, alt, s):
-    return track.Observer(sat = s, loc = (lon, lat, alt)).get_next_pass()
 
-@app.route('/api/get_next_pass/<int:lon>,<int:lat>,<int:alt>')
+@api.route('/api/get_next_pass/<string:s>/<float:lon>,<float:lat>,<float:alt>')
+def next_pass(lon, lat, alt, s):
+    try:
+        return track.Observer(sat = s, loc = (lon, lat, alt)).get_next_pass()
+    except KeyError:
+        return sat_not_found
+
+@api.route('/api/get_next_pass/<float:lon>,<float:lat>,<float:alt>')
 def next_pass_with_loc(lon, lat, alt):
     return track.Observer(loc = (lon, lat, alt)).get_next_pass()
-    
-@app.route('/api/get_next_pass/<string:s>')
+
+@api.route('/api/get_next_pass/<string:s>')
 def next_pass_with_sat(s):
-    return track.Observer(sat = s).get_next_pass()
-    
-@app.route('/api/get_next_pass')
+    try:
+        return track.Observer(sat = s).get_next_pass()
+    except KeyError:
+        return sat_not_found
+
+@api.route('/api/get_next_pass')
 def next_pass_default():
     return track.Observer().get_next_pass()
 
+# Maual maintenance
+@api.route('/api/update')
+def update_tle():
+    helpers.update_TLE()
+    time = json.loads(track.Tracker().get_time())["current_time"]
+    return json.dumps({"updated_time": time})
+
 if __name__ == '__main__':
-    app.run(debug = False, host = '0.0.0.0', port = 80)
+    api.run(debug = False, host = '0.0.0.0', port = 80)

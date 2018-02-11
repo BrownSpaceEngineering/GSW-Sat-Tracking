@@ -1,0 +1,27 @@
+<h1>API User Guide</h1>
+<p>The api reports location and speed of a specific satellite. </p>
+<p>For source code, go to <a href="https://github.com/tydlwav/GSW-Sat-Tracking">this github repository</a>.</p>
+<p>In testing, all SATELLITE will be defaulted to "ISS (ZARYA)" and all LON LAT ALT will be determined by location of ip the request is sent from</p>
+<h3>./api/get_time</h3>
+<p>gets current time</p>
+<p>example json:<br />{"current_time": "2017-11-14T18:51:46"}</p>
+<h3>./api/get_velocity_vector[/SATELLITE]</h3>
+<p>gets velocity vector of SATELLITE in km/s<br />The origin at the center of mass of the earth, a point close to the Earth's center of figure
+<br />The Z axis on the line between the north and south poles, with positive values increasing northward (but does not exactly coincide with the Earth's rotational axis)[13]
+<br />The X and Y axes in the plane of the equator
+<br />The X axis passing through extending from 180 degrees longitude at the equator (negative) to 0 degrees longitude (prime meridian) at the equator (positive)
+<br />The Y axis passing through extending from 90 degrees west longitude at the equator (negative) to 90 degrees east longitude at the equator (positive)
+</p>
+<p>example json:<br />{"velocity_vector_x": 4.142431217482311, "velocity_vector_y": -3.683046787698025, "velocity_vector_z": -5.296093950127022}</p>
+<h3>./api/get_velocity[/SATELLITE]</h3>
+<p>gets velocity of SATELLITE in km/s</p>
+<p>example json:<br />{"velocity": 7.66929425407547}</p>
+<h3>./api/get_lonlatalt[/SATELLITE]</h3>
+<p>gets longitude latitude and altitude of SATELLITE</p>
+<p>example json:<br />{"longitude": 55.11298676461255, "latitude": 39.95531405346363, "altitude": 406.60357716362483}</p>
+<h3>./api/get_az_el[/SATELLITE][/LON,LAT,ALT]</h3>
+<p>gets azimuth and elevation of SATELLITE at location (LON, LAT, ALT) in degrees</p>
+<p>example json:<br />{"azimuth_angle": 159.5700144782178, "elevation_angle": -43.62036623984851}</p>
+<h2>MANUALLY UPDATE TLE</h2>
+<h3>./api/update</h3>
+<p>updates TLE file used to compute all answers, recommend not use this function as the system automatically updates the file. </p>
