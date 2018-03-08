@@ -1,8 +1,0 @@
-APT-GET
-python3-pip
-build-essential
-
-PIP/PIP3
-pyorbital
-pyephem
-urllib2

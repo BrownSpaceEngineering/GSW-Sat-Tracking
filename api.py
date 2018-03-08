@@ -13,7 +13,7 @@ class FloatConverter(BaseFloatConverter):
 api.url_map.converters['float'] = FloatConverter
 
 sat_not_found = "404 - Satellite Not Found"
-guide_path = './guide/index.html'
+guide_path = './docs/index.html'
 
 # API User Guide
 @api.route('/api')

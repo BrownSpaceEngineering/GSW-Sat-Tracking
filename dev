@@ -1,0 +1,2 @@
+echo "run \"deactivate\" to end development"
+source .env/bin/activate
