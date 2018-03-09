@@ -30,6 +30,11 @@ This means, most Linux and OS X systems would work fine.
 ## Installation
 Both installation and reinstallation is done by running `sh install.sh` under the cloned directory. Make sure you have the requirements installed. There will be a prompt if a virtual environment is already present under your directory.
 
+## Running Server
+
+* To run server, run `sh start.sh`
+* To stop server, run `sh stop.sh`
+
 ## Issues
 * Note that oh-my-zsh may not print out virtualenv header during development mode due to weird theme settings.  
 ***This is an up-stream issue that cannot be fixed here.***
