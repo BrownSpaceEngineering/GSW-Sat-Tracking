@@ -1,8 +1,8 @@
-# Detailed guide in guide/index.html
+# User Guide
 
 You will be able to reference the guide through URL/api after you deploy the api to URL.
 
-Alternatively, you can visit the help page [here](http://www.michaelmao.me/GSW-Sat-Tracking/) without deploying. 
+Alternatively, you can visit the help page [here](http://www.michaelmao.me/GSW-Sat-Tracking/) without deploying.
 
 # Deploy
 
@@ -19,6 +19,7 @@ This means, most Linux and OS X systems would work fine.
 * **pip**
 * **virtualenv**
 * **Internet access**
+* **super user privilege**
 
 ### Requirements Installation Guide
 

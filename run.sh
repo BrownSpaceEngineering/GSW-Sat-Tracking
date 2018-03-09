@@ -1,3 +1,3 @@
 source .env/bin/activate
-sudo python api.py
+sudo nohup python api.py &
 deactivate
