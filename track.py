@@ -33,6 +33,7 @@ from pyorbital.orbital import Orbital
 from math import sqrt
 from collections import OrderedDict
 import json
+import datetime
 import ephem
 from helpers import *
 
@@ -43,8 +44,9 @@ class Tracker:
     def __init__(self, sat = def_sat):
         self.orb = get_orbital(sat)
 
-    def get_velocity_vector(self):
-        normPos = self.orb.get_position(self._time(self), normalize=False)
+    def get_velocity_vector(self, time = datetime.utcnow()):
+        _time = self._time(self)
+        normPos = self.orb.get_position(time, normalize=False)
         vel = normPos[1]
         d = OrderedDict([
             ('velocity_vector_x', vel[0]),
@@ -53,15 +55,17 @@ class Tracker:
         ])
         return json.dumps(d)
 
-    def get_velocity(self):
-        normPos = self.orb.get_position(self._time(self), normalize=False)
+    def get_velocity(self, time = datetime.utcnow()):
+        _time = self._time(self)
+        normPos = self.orb.get_position(time, normalize=False)
         vel = normPos[1]
         v = sqrt(sum(map(lambda x: x**2, vel)))
         d = {'velocity': v}
         return json.dumps(d)
 
-    def get_lonlatalt(self):
-        lonlatalt = self.orb.get_lonlatalt(self._time(self))
+    def get_lonlatalt(self, time = datetime.utcnow()):
+        _time = self._time(self)
+        lonlatalt = self.orb.get_lonlatalt(time)
         d = OrderedDict([
             ('longitude', lonlatalt[0]),
             ('latitude', lonlatalt[1]),
@@ -84,9 +88,10 @@ class Observer:
         self.orb = get_orbital(sat)
         self.loc = loc
 
-    def get_az_el(self):
+    def get_az_el(self, time = datetime.utcnow()):
+        _time = self._time(self)
         loc = self.loc
-        az_el = self.orb.get_observer_look(self._time(self), loc[0], loc[1], loc[2])
+        az_el = self.orb.get_observer_look(time, loc[0], loc[1], loc[2])
         d = OrderedDict([
             ('azimuth_angle', az_el[0]),
             ('elevation_angle', az_el[1])

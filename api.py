@@ -33,6 +33,13 @@ def velocity_vector(s):
     except KeyError:
     	return sat_not_found
 
+@api.route('/api/get_velocity_vector/<string:s>/<float:hour>,<float:minute>,<float:second>')
+def velocity_vector_with_time(s, hour, minute, second):
+    try:
+        return track.Tracker(s).get_velocity_vector(time=datetime.time(hour, minute, second))
+    except KeyError:
+        return sat_not_found
+
 @api.route('/api/get_velocity_vector')
 def velocity_vector_default():
     return track.Tracker().get_velocity_vector()
@@ -48,10 +55,24 @@ def velocity(s):
     except KeyError:
         return sat_not_found
 
+@api.route('/api/get_velocity/<string:s>/<float:hour>,<float:minute>,<float:second>')
+def velocity_with_time(s, hour, minute, second):
+    try:
+        return track.Tracker(s).get_velocity(time=datetime.time(hour,minute,second))
+    except KeyError:
+        return sat_not_found
+
 @api.route('/api/get_lonlatalt/<string:s>')
 def lonlatalt(s):
     try:
         return track.Tracker(s).get_lonlatalt()
+    except KeyError:
+        return sat_not_found
+
+@api.route('/api/get_lonlatalt/<string:s>/<float:hour>,<float:minute>,<float:second>')
+def lonlatalt_with_time(s, hour, minute, second):
+    try:
+        return track.Tracker(s).get_lonlatalt(time=datetime.time(hour,minute,second))
     except KeyError:
         return sat_not_found
 
@@ -64,6 +85,13 @@ def lonlatalt_default():
 def az_el(lon, lat, alt, s):
     try:
         return track.Observer(sat = s, loc = (lon, lat, alt)).get_az_el()
+    except KeyError:
+        return sat_not_found
+
+@api.route('/api/get_az_el/<string:s>/<float:lon>,<float:lat>,<float:alt>/<float:hour>,<float:minute>,<float:second>')
+def az_el_with_time(lon, lat, alt, s, hour, minute, second):
+    try:
+        return track.Observer(sat = s, loc = (lon, lat, alt)).get_az_el(time=datetime.time(hour, minute, second))
     except KeyError:
         return sat_not_found
 
