@@ -26,6 +26,22 @@ def api_guide():
 def time():
     return track.Tracker().get_time()
 
+@api.route('/api/get_orbit_number')
+def get_orbit_number_default():
+    return track.Tracker().get_orbit_number()
+
+@api.route('/api/get_orbit_number/<string:s>')
+def get_orbit_number_with_sat(s):
+    return track.Tracker(s).get_orbit_number()
+
+@api.route('/api/get_orbit_number/<string:s>/<float:hour>,<float:minute>,<float:second>')
+def get_orbit_number_at_time(s, hour, minute, second):
+    return track.Tracker(s).get_orbit_number(time = datetime.time(hour, minute, second))
+
+@api.route('/api/get_next_passes/<string:s>/<float:length>/<float:hour>,<float:minute>,<float:second>/<float:lon>,<float:lat>,<float:alt>')
+def get_next_passes(s, length, hour, minute, second, lon, lat, alt):
+    return track.Tracker(s).get_next_passes(datetime.time(hour, minute, second), length, lon, lat, alt)
+
 @api.route('/api/get_velocity_vector/<string:s>')
 def velocity_vector(s):
     try:
@@ -58,6 +74,12 @@ def lonlatalt(s):
 @api.route('/api/get_lonlatalt')
 def lonlatalt_default():
     return track.Tracker().get_lonlatalt()
+
+@api.route('/api/get_lonlatalt_list/<string:s><float:starthour>,<float:startsecond>/<float:endhour>,<float:endsecond>/<float:interval>')
+def lonlatalt_list(s, starthour, startsecond, endhour, endsecond, interval):
+    # times are passed in as (hours, seconds) because datetime's timedelta
+    # object does not allow for minutes.
+    return track.Tracker(s).get_lonlatalt_list(datetime.timedelta(starthour, startsecond), datetime.timedelta(endhour, endsecond), interval)
 
 # Observers
 @api.route('/api/get_az_el/<string:s>/<float:lon>,<float:lat>,<float:alt>')

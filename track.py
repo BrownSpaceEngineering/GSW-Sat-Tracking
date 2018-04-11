@@ -43,6 +43,7 @@ class Tracker:
     def __init__(self, sat = def_sat):
         self.orb = get_orbital(sat)
 
+
     def get_velocity_vector(self):
         normPos = self.orb.get_position(self._time(self), normalize=False)
         vel = normPos[1]
@@ -69,10 +70,41 @@ class Tracker:
         ])
         return json.dumps(d)
 
+    # takes in a startTime, which is a timeDelta object representing
+    # the distance into the past we are starting at, and endTime,
+    # a timeDelta object representing the distance into the future
+    # we are searching until.
+    def get_lonlatalt_list(self, startTime, endTime, interval):
+        locationList = []
+        # timedelta takes in (hours, seconds). Interval is the
+        # number of seconds we increase by every time.
+        timedelta = datetime.timedelta(0,interval)
+        present = datetime.utcnow()
+        # calculate the start and end points
+        currTime = present - startTime
+        finalTime = present + endTime
+        while(currTime < finalTime):
+            lonlatalt = self.orb.get_lonlatalt(currTime)
+            currTime += timedelta
+            d = OrderedDict([
+                ('longitude', lonlatalt[0]),
+                ('latitude', lonlatalt[1]),
+                ('altitude', lonlatalt[2])
+            ])
+            currLocation = json.dumps(d)
+            locationList.append(currLocation)
+        return locationList
+
     def get_time(self):
         time = datetime.utcnow()
         d = {'current_time' : time.strftime('%Y-%m-%dT%H:%M:%S')}
         return json.dumps(d)
+    
+    def get_next_passes(self, time, length, lon, lat, alt):
+        return self.orb.get_next_passes(time, length, lon, lat, alt)
+
+    def get_orbit_number(self, time=datetime.utcnow()):
+        return self.orb.get_orbit_number(time)
 
 class Observer:
     _time = staticmethod(time)
