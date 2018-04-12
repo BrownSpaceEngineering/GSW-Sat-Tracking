@@ -75,6 +75,7 @@ def lonlatalt(s):
 def lonlatalt_default():
     return track.Tracker().get_lonlatalt()
 
+
 @api.route('/api/get_lonlatalt_list/<string:s><float:starthour>,<float:startsecond>/<float:endhour>,<float:endsecond>/<float:interval>')
 def lonlatalt_list(s, starthour, startsecond, endhour, endsecond, interval):
     # times are passed in as (hours, seconds) because datetime's timedelta
