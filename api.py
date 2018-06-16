@@ -1,6 +1,7 @@
 import track
+import datetime
 import helpers
-from flask import Flask
+from flask import Flask, jsonify
 import json
 from werkzeug.routing import FloatConverter as BaseFloatConverter
 
@@ -38,9 +39,15 @@ def get_orbit_number_with_sat(s):
 def get_orbit_number_at_time(s, hour, minute, second):
     return track.Tracker(s).get_orbit_number(time = datetime.time(hour, minute, second))
 
-@api.route('/api/get_next_passes/<string:s>/<float:length>/<float:hour>,<float:minute>,<float:second>/<float:lon>,<float:lat>,<float:alt>')
+@api.route('/api/get_next_passes/<string:s>/<int:length>/<int:hour>,<int:minute>,<int:second>/<float:lon>,<float:lat>,<float:alt>')
 def get_next_passes(s, length, hour, minute, second, lon, lat, alt):
-    return track.Tracker(s).get_next_passes(datetime.time(hour, minute, second), length, lon, lat, alt)
+    now = datetime.datetime.now()
+    dtime = datetime.datetime(now.year, now.month, now.day, hour, minute, second)
+    pass_times = track.Tracker(s).get_next_passes(dtime, length, lon, lat, alt)
+    posix_times = []
+    for dtime in pass_times:
+        posix_times.append(float(dtime.strftime("%s.%f")))
+    return jsonify(posix_times)
 
 @api.route('/api/get_velocity_vector/<string:s>')
 def velocity_vector(s):
@@ -76,11 +83,15 @@ def lonlatalt_default():
     return track.Tracker().get_lonlatalt()
 
 
-@api.route('/api/get_lonlatalt_list/<string:s><float:starthour>,<float:startsecond>/<float:endhour>,<float:endsecond>/<float:interval>')
+@api.route('/api/get_lonlatalt_list/<string:s>/<float:starthour>,<float:startsecond>/<float:endhour>,<float:endsecond>/<float:interval>')
 def lonlatalt_list(s, starthour, startsecond, endhour, endsecond, interval):
     # times are passed in as (hours, seconds) because datetime's timedelta
     # object does not allow for minutes.
-    return track.Tracker(s).get_lonlatalt_list(datetime.timedelta(starthour, startsecond), datetime.timedelta(endhour, endsecond), interval)
+    list_of_json = track.Tracker(s).get_lonlatalt_list(datetime.timedelta(starthour, startsecond), datetime.timedelta(endhour, endsecond), interval)
+    full_string = "["
+    for elm in list_of_json:
+        full_string += elm + ","
+    return full_string[:len(full_string)-1] + "]" # remove ","
 
 # Observers
 @api.route('/api/get_az_el/<string:s>/<float:lon>,<float:lat>,<float:alt>')
@@ -135,4 +146,5 @@ def update_tle():
     return json.dumps({"updated_time": time})
 
 if __name__ == '__main__':
+    helpers.update_TLE()
     api.run(debug = False, host = '0.0.0.0', port = 80)

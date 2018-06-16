@@ -53,6 +53,10 @@ def get_TLE(sat):
 def time(self):
     return datetime.utcnow()
 
+def ephem_to_unix(ephemdate):
+    """ Converts pyephem date into POSIX unix time float (secs.ms since 1/1/1970) """
+    return float(ephemdate.datetime().strftime("%s.%f"))
+
 if __name__ == '__main__':
     print("updating tle")
     update_TLE()

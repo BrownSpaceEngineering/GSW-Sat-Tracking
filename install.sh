@@ -38,11 +38,11 @@ then
     then
         sudo rm -rf .env
     fi
-    
+
     echo virtualenv found
     virtualenv -p $PYTHON .env
     source .env/bin/activate
-    pip install -r requirements.txt
+    pip3 install -r requirements.txt
     deactivate
 else
     sudo -H $PIP install virtualenv
