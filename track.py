@@ -37,13 +37,14 @@ import json
 import ephem
 from helpers import *
 
+DEFAULT_SAT = "ISS (ZARYA)"
+
 class Tracker:
     _time = staticmethod(time)
-    def_sat = 'ISS (ZARYA)'
+    def_sat = DEFAULT_SAT
 
-    def __init__(self, sat = def_sat):
-        self.orb = get_orbital(sat)
-
+    def __init__(self, sat = def_sat, tle_file = DEFAULT_TLE_FILE):
+        self.orb = get_orbital(sat, tle_file)
 
     def get_velocity_vector(self):
         normPos = self.orb.get_position(self._time(self), normalize=False)
@@ -109,13 +110,14 @@ class Tracker:
 
 class Observer:
     _time = staticmethod(time)
-    def_sat = 'ISS (ZARYA)'
+    def_sat = DEFAULT_SAT
     ip_loc = get_ip_loc()
 
-    def __init__(self, sat = def_sat, loc = ip_loc):
+    def __init__(self, sat = def_sat, loc = ip_loc, tle_file = DEFAULT_TLE_FILE):
         self.sat = sat
-        self.orb = get_orbital(sat)
+        self.orb = get_orbital(sat, tle_file)
         self.loc = loc
+        self.tle_file = tle_file
 
     def get_az_el(self):
         loc = self.loc
@@ -127,7 +129,7 @@ class Observer:
         return json.dumps(d)
 
     def get_next_pass(self):
-        tle = get_TLE(self.sat)
+        tle = get_TLE(self.sat, self.tle_file)
         sat = ephem.readtle(tle[0], tle[1], tle[2])
         obs = ephem.Observer()
         obs.lon, obs.lat, obs.elevation = self.loc

@@ -3,9 +3,14 @@ from pyorbital.orbital import Orbital
 from datetime import datetime
 import json
 import urllib
+import threading, atexit
+
+DEFAULT_TLE_FILE = "tle.txt"
+TLE_UPDATE_PERIOD_S = 3*60*60
+tle_update_timer = None
 
 def update_TLE():
-    with open('./tle.txt', 'w') as tle_file:
+    with open(DEFAULT_TLE_FILE, 'w') as tle_file:
         # Make file blank
         tle_file.truncate(0)
         # Space Stations
@@ -35,13 +40,11 @@ def get_ISS_loc():
     lon = j['iss_position']['longitude']
     return (lat,lon)
 
-def get_orbital(sat):
-    file_path = "tle.txt"
+def get_orbital(sat, file_path=DEFAULT_TLE_FILE):
     orb = Orbital(sat, file_path)
     return orb
 
-def get_TLE(sat):
-    file_path = "tle.txt"
+def get_TLE(sat, file_path=DEFAULT_TLE_FILE):
     tle_file = open(file_path, 'r')
     s = tle_file.read()
     tle_list = [x.split(" ") for x in s.split("\n")]
@@ -56,6 +59,23 @@ def time(self):
 def ephem_to_unix(ephemdate):
     """ Converts pyephem date into POSIX unix time float (secs.ms since 1/1/1970) """
     return float(ephemdate.datetime().strftime("%s.%f"))
+
+# tle update helpers
+def update_tle_cb():
+    print("%s: updating TLEs" % datetime.now())
+    update_TLE()
+    tle_update_timer = threading.Timer(TLE_UPDATE_PERIOD_S, update_tle_cb)
+    tle_update_timer.setDaemon(True)
+    tle_update_timer.start()
+
+def stop_update_tle_daemon():
+    if tle_update_timer is not None:
+        tle_update_timer.cancel()
+        tle_update_timer.join()
+
+def start_update_tle_daemon():
+    update_tle_cb()
+    atexit.register(stop_update_tle_daemon)
 
 if __name__ == '__main__':
     print("updating tle")
