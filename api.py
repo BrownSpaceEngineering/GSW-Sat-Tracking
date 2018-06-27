@@ -29,6 +29,7 @@ def api_guide():
 
 # Trackers
 @api.route('/api/tle')
+@api.route('/api/Amateur.tle')
 def equisat_tle():
     return api.send_static_file(TLE_FILE)
 
