@@ -38,6 +38,8 @@ from collections import OrderedDict
 import threading
 from datetime import datetime
 import time
+import portalocker
+import helpers
 
 account_sid = "ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 # Your Auth Token from twilio.com/console
@@ -69,10 +71,11 @@ class PhoneClient:
                     break
 
         with open('phoneDB.csv', 'a') as f:
+            portalocker.lock(f, portalocker.LOCK_EX)
             writer = csv.DictWriter(f, fieldnames=fieldnames)         
             writer.writerow({'number': number, 'lat': lat, 'lon':lon})   
             #message = client.messages.create(to=number,from_=gsw_num,body="Registered! We are tracking u fam. reply STOP and we wont stalk")
-
+            portalocker.unlock(f)
         return True
 
 class DatabaseMonitor:
@@ -89,7 +92,8 @@ class DatabaseMonitor:
                 #lock file
                 for row in reversed(list(reader)):
                     #sat = 'ISS (ZARYA)', loc = (int(row['lon']), int(row['lat']), 0)
-                    pass_info = track.Observer(loc = (int(row['lon']), int(row['lat']), 0)).get_next_pass()
+                    pass_info = track.Observer().get_next_pass()
+                    print(pass_info)
                     pass_dictionary = json.loads(pass_info)
                     ephem_date = convert_ephem_float_to_date(pass_dictionary['rise_time'])
                     rise_time = datetime.strptime(str(ephem_date), "%Y/%m/%d %H:%M:%S")
@@ -97,13 +101,14 @@ class DatabaseMonitor:
                     print(minutes_diff)
                     if minutes_diff < 5:
                         send_sms(row['number'])
+
             time.sleep(10)
 
     def start_timer(self):
         t = threading.Thread(target=self.search_database)
         t.start()
 
-
+#PhoneClient().register_number(17,149,201)
 DatabaseMonitor().start_timer();
 
 #PhoneClient().register_number(1,5,4)

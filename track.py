@@ -28,21 +28,23 @@
 """
 
 from pyorbital import tlefile
-from datetime import datetime
+from datetime import datetime, timedelta
 from pyorbital.orbital import Orbital
 from math import sqrt
 from collections import OrderedDict
+import math
 import json
 import ephem
 from helpers import *
 
+DEFAULT_SAT = "ISS (ZARYA)"
+
 class Tracker:
     _time = staticmethod(time)
-    def_sat = 'ISS (ZARYA)'
+    def_sat = DEFAULT_SAT
 
-    def __init__(self, sat = def_sat):
-        self.orb = get_orbital(sat)
-
+    def __init__(self, sat = def_sat, tle_file = DEFAULT_TLE_FILE):
+        self.orb = get_orbital(sat, tle_file)
 
     def get_velocity_vector(self):
         normPos = self.orb.get_position(self._time(self), normalize=False)
@@ -78,14 +80,14 @@ class Tracker:
         locationList = []
         # timedelta takes in (hours, seconds). Interval is the
         # number of seconds we increase by every time.
-        timedelta = datetime.timedelta(0,interval)
+        tdelta = timedelta(0,interval)
         present = datetime.utcnow()
         # calculate the start and end points
         currTime = present - startTime
         finalTime = present + endTime
         while(currTime < finalTime):
             lonlatalt = self.orb.get_lonlatalt(currTime)
-            currTime += timedelta
+            currTime += tdelta
             d = OrderedDict([
                 ('longitude', lonlatalt[0]),
                 ('latitude', lonlatalt[1]),
@@ -99,7 +101,7 @@ class Tracker:
         time = datetime.utcnow()
         d = {'current_time' : time.strftime('%Y-%m-%dT%H:%M:%S')}
         return json.dumps(d)
-    
+
     def get_next_passes(self, time, length, lon, lat, alt):
         return self.orb.get_next_passes(time, length, lon, lat, alt)
 
@@ -108,13 +110,14 @@ class Tracker:
 
 class Observer:
     _time = staticmethod(time)
-    def_sat = 'ISS (ZARYA)'
+    def_sat = DEFAULT_SAT
     ip_loc = get_ip_loc()
 
-    def __init__(self, sat = def_sat, loc = ip_loc):
+    def __init__(self, sat = def_sat, loc = ip_loc, tle_file = DEFAULT_TLE_FILE):
         self.sat = sat
-        self.orb = get_orbital(sat)
+        self.orb = get_orbital(sat, tle_file)
         self.loc = loc
+        self.tle_file = tle_file
 
     def get_az_el(self):
         loc = self.loc
@@ -132,24 +135,28 @@ class Observer:
         obs.lon, obs.lat, obs.elevation = self.loc
         passData = obs.next_pass(sat)
         # next_pass returns a six-element tuple giving:
+        # (dates are in UTC)
         # 0  Rise time
         # 1  Rise azimuth
         # 2  Maximum altitude time
         # 3  Maximum altitude
         # 4  Set time
         # 5  Set azimuth
+        # date info: http://rhodesmill.org/pyephem/date
+        # next_pass info:
+        # https://github.com/brandon-rhodes/pyephem/blob/592ecff661adb9c5cbed7437a23d705555d7ce57/libastro-3.7.7/riset_cir.c#L17
         d = OrderedDict([
-            ('rise_time', passData[0]),
-            ('rise_azimuth', passData[1]),
-            ('max_alt_time', passData[2]),
-            ('max_alt', passData[3]),
-            ('set_time', passData[4]),
-            ('set_azimuth', passData[5])
+            ('rise_time', ephem_to_unix(passData[0])),
+            ('rise_azimuth', math.degrees(passData[1])),
+            ('max_alt_time', ephem_to_unix(passData[2])),
+            ('max_alt', math.degrees(passData[3])),
+            ('set_time', ephem_to_unix(passData[4])),
+            ('set_azimuth', math.degrees(passData[5]))
         ])
         return json.dumps(d)
+
 
 if __name__ == "__main__":
     t = Tracker()
     o = Observer()
-    print(t.get_time(), t.get_velocity_vector(), t.get_velocity(), t.get_lonlatalt(),
-        o.get_az_el(), o.get_next_pass(), sep = "\n")
+    print(t.get_time(), t.get_velocity_vector(), t.get_velocity(), t.get_lonlatalt(), o.get_az_el(), o.get_next_pass(), sep="\n")
