@@ -1,4 +1,5 @@
 import track
+import client
 import helpers
 from flask import Flask
 import json
@@ -126,6 +127,14 @@ def next_pass_with_sat(s):
 @api.route('/api/get_next_pass')
 def next_pass_default():
     return track.Observer().get_next_pass()
+
+@api.route('/api/number_exists/<string:number>')
+def number_exists(number):
+    return client.get_loc_info(number)
+
+@api.route('/api/register/<string:number>,<float:lat>,<float:lon>')
+def register_phone(number,lat,lon):
+    return client.register_phone(number, lat, lon)
 
 # Maual maintenance
 @api.route('/api/update')

@@ -3,6 +3,10 @@ from pyorbital.orbital import Orbital
 from datetime import datetime
 import json
 import urllib
+import ephem
+
+def convert_ephem_float_to_date(float_date):
+    return ephem.Date(float_date)
 
 def update_TLE():
     with open('./tle.txt', 'w') as tle_file:
@@ -25,7 +29,7 @@ def get_ip_loc():
     lon = j['longitude']
     # print("latitude: " + str(lat))
     # print("longitude: " + str(lon))
-    return (lat,lon,0)
+    return (lon,lat,0)
 
 def get_ISS_loc():
     url = "http://api.open-notify.org/iss-now.json"
