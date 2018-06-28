@@ -152,7 +152,7 @@ def next_pass_default():
 @api.route('/api/update')
 def update_tle():
     helpers.update_TLE()
-    time = json.loads(track.Tracker(DEFAULT_TLE_FILE).get_time())["current_time"]
+    time = json.loads(track.Tracker(tle_file = DEFAULT_TLE_FILE).get_time())["current_time"]
     return json.dumps({"updated_time": time})
 
 if __name__ == '__main__':
