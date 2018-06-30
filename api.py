@@ -2,11 +2,13 @@ import track
 import datetime
 import helpers
 from flask import Flask, jsonify, send_from_directory
+from flask_cors import CORS
 import json
 from helpers import DEFAULT_TLE_FILE
 from werkzeug.routing import FloatConverter as BaseFloatConverter
 
 api = Flask(__name__, static_folder="./")
+CORS(api)
 
 class FloatConverter(BaseFloatConverter):
     regex = r'-?\d+(\.\d+)?'
