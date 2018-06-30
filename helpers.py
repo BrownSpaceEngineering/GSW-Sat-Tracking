@@ -4,12 +4,15 @@ from datetime import datetime
 import json
 import urllib
 import threading, atexit
+import re
 
 DEFAULT_TLE_FILE = "tle.txt"
 TLE_UPDATE_PERIOD_S = 3*60*60
 tle_update_timer = None
+EQUISAT_TLE = ""
 
 def update_TLE():
+    extractEQUiSatTLE()
     with open(DEFAULT_TLE_FILE, 'w') as tle_file:
         # Make file blank
         tle_file.truncate(0)
@@ -76,6 +79,23 @@ def stop_update_tle_daemon():
 def start_update_tle_daemon():
     update_tle_cb()
     atexit.register(stop_update_tle_daemon)
+
+def extractEQUiSatTLE():    
+    with open(DEFAULT_TLE_FILE, 'r') as tle_file:
+        print("HERE")
+        tles_str = tle_file.read()
+        print("FILE")
+        print(tles_str)
+        equisat_tle = re.search("EQUISAT(.*\n){3}", tles_str)
+        print("T1")
+        print(equisat_tle)
+        if (equisat_tle == None):
+            print("T2")
+            equisat_tle = re.search("ISS \(ZARYA\)(.*\n){3}", tles_str)
+            print(equisat_tle)
+        if (equisat_tle):
+            with open("equisat-tle.txt", "w+") as equisat_tle_file:
+                equisat_tle_file.write(equisat_tle.group()) 
 
 if __name__ == '__main__':
     print("updating tle")
