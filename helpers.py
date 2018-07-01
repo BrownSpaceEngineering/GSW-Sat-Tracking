@@ -88,7 +88,7 @@ def extractEQUiSatTLE():
             equisat_tle = re.search("ISS \(ZARYA\)(.*\n){3}", tles_str)            
         if (equisat_tle):
             with open("equisat-tle.txt", "w+") as equisat_tle_file:
-                equisat_tle_file.write(equisat_tle.group()) 
+                equisat_tle_file.write(equisat_tle.group()[:-1]) 
 
 if __name__ == '__main__':
     print("updating tle")
