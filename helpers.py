@@ -81,18 +81,11 @@ def start_update_tle_daemon():
     atexit.register(stop_update_tle_daemon)
 
 def extractEQUiSatTLE():    
-    with open(DEFAULT_TLE_FILE, 'r') as tle_file:
-        print("HERE")
-        tles_str = tle_file.read()
-        print("FILE")
-        print(tles_str)
-        equisat_tle = re.search("EQUISAT(.*\n){3}", tles_str)
-        print("T1")
-        print(equisat_tle)
-        if (equisat_tle == None):
-            print("T2")
-            equisat_tle = re.search("ISS \(ZARYA\)(.*\n){3}", tles_str)
-            print(equisat_tle)
+    with open(DEFAULT_TLE_FILE, 'r') as tle_file:        
+        tles_str = tle_file.read()        Z        
+        equisat_tle = re.search("EQUISAT(.*\n){3}", tles_str)        
+        if (equisat_tle == None):            
+            equisat_tle = re.search("ISS \(ZARYA\)(.*\n){3}", tles_str)            
         if (equisat_tle):
             with open("equisat-tle.txt", "w+") as equisat_tle_file:
                 equisat_tle_file.write(equisat_tle.group()) 
