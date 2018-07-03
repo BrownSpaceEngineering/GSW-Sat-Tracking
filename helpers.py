@@ -16,6 +16,9 @@ EQUISAT_TLE = ""
 def convert_ephem_float_to_date(float_date):
     return ephem.Date(float_date)
 
+def convert_unix_time_to_date(float_date):
+    return datetime.fromtimestamp(float_date)
+
 def update_TLE():
     extractEQUiSatTLE()
     with open(DEFAULT_TLE_FILE, 'w') as tle_file:

@@ -61,10 +61,9 @@ def get_orbit_number_with_sat(s):
 def get_orbit_number_at_time(s, hour, minute, second):
     return track.Tracker(s, tle_file = TLE_FILE).get_orbit_number(time = datetime.time(hour, minute, second))
 
-@api.route('/api/get_next_passes/<string:s>/<int:length>/<int:hour>,<int:minute>,<int:second>/<float:lon>,<float:lat>,<float:alt>')
-def get_next_passes(s, length, hour, minute, second, lon, lat, alt):
-    now = datetime.datetime.now()
-    dtime = datetime.datetime(now.year, now.month, now.day, hour, minute, second)
+@api.route('/api/get_next_passes/<string:s>/<int:length>/<float:lon>,<float:lat>,<float:alt>')
+def get_next_passes(s, length, lon, lat, alt):
+    dtime = datetime.datetime.now()
     pass_times = track.Tracker(s, tle_file = TLE_FILE).get_next_passes(dtime, length, lon, lat, alt)
     posix_times = []
     for dtime in pass_times:
