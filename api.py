@@ -175,5 +175,5 @@ def update_tle():
     return json.dumps({"updated_time": time})
 
 if __name__ == '__main__':
-    #helpers.start_update_tle_daemon()
+    helpers.start_update_tle_daemon()
     api.run(debug = False, host = '0.0.0.0', port = 80)

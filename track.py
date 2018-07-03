@@ -131,11 +131,10 @@ class Observer:
     def get_next_pass(self):
         tle = get_TLE(self.sat)
         sat = ephem.readtle(tle[0], tle[1], tle[2])
-        obs = ephem.Observer()
-        #obs.date = datetime.utcnow() + timedelta(minutes=5)
+        print(tle)
+        obs = ephem.Observer()        
         lon, lat, el = self.loc
-        obs.lon, obs.lat, obs.elevation = str(lon), str(lat), 0
-        obs.date = datetime(2018,6,30,10,0,0)
+        obs.lon, obs.lat, obs.elevation = str(lon), str(lat), 0        
         passData = obs.next_pass(sat)
         # next_pass returns a six-element tuple giving:
         # (dates are in UTC)

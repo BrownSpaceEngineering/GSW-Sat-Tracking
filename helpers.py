@@ -7,7 +7,7 @@ import threading, atexit
 import ephem
 import re
 
-DEFAULT_TLE_FILE = "equisat-tle.txt"
+DEFAULT_TLE_FILE = "tle.txt"
 TLE_UPDATE_PERIOD_S = 3*60*60
 tle_update_timer = None
 EQUISAT_TLE = ""
