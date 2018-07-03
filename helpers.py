@@ -1,6 +1,7 @@
 import requests
 from pyorbital.orbital import Orbital
 from datetime import datetime
+import calendar
 import json
 import urllib
 import threading, atexit
@@ -42,9 +43,7 @@ def get_ip_loc():
     location = j['loc']
     # We receive the location as a "lat,lon" string, with values separated by a comma
     lat = location.split(',')[0]
-    lon = location.split(',')[1]
-    # print("latitude: " + str(lat))
-    # print("longitude: " + str(lon))
+    lon = location.split(',')[1]    
     return (lon,lat,0), True
 
 def get_ISS_loc():
@@ -72,8 +71,8 @@ def time(self):
     return datetime.utcnow()
 
 def ephem_to_unix(ephemdate):
-    """ Converts pyephem date into POSIX unix time float (secs.ms since 1/1/1970) """
-    return float(ephemdate.datetime().strftime("%s.%f"))
+    """ Converts pyephem date into POSIX unix time float (secs.ms since 1/1/1970) """    
+    return calendar.timegm(ephemdate.datetime().utctimetuple())
 
 # tle update helpers
 def update_tle_cb():
