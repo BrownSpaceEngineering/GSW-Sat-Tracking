@@ -19,6 +19,7 @@ api.url_map.converters['float'] = FloatConverter
 
 sat_not_found = "404 - Satellite Not Found"
 guide_path = './docs/index.html'
+ip_request_failed = "404 - Cannot make IP Location Request"
 
 # tle file customization. Static file will not be auto-updated, default will be.
 USE_STATIC_TLE_FILE = False
@@ -121,10 +122,15 @@ def az_el(lon, lat, alt, s):
         return track.Observer(sat = s, loc = (lon, lat, alt), tle_file = TLE_FILE).get_az_el()
     except KeyError:
         return sat_not_found
-
+    except requests.exceptions.HTTPError:
+        return ip_request_failed 
+        
 @api.route('/api/get_az_el/<float:lon>,<float:lat>,<float:alt>')
 def az_el_with_loc(lon, lat, alt):
-    return track.Observer(loc = (lon, lat, alt), tle_file = TLE_FILE).get_az_el()
+    try:
+        return track.Observer(loc = (lon, lat, alt), tle_file = TLE_FILE).get_az_el()
+    except requests.exceptions.HTTPError:
+        return ip_request_failed 
 
 @api.route('/api/get_az_el/<string:s>')
 def az_el_with_sat(s):
@@ -132,10 +138,15 @@ def az_el_with_sat(s):
         return track.Observer(sat = s, tle_file = TLE_FILE).get_az_el()
     except KeyError:
     	return sat_not_found
+    except requests.exceptions.HTTPError:
+        return ip_request_failed 
 
 @api.route('/api/get_az_el')
 def az_el_default():
-    return track.Observer(tle_file = TLE_FILE).get_az_el()
+    try:
+        return track.Observer(tle_file = TLE_FILE).get_az_el()
+    except requests.exceptions.HTTPError:
+        return ip_request_failed 
 
 @api.route('/api/get_next_pass/<string:s>/<float:lon>,<float:lat>,<float:alt>')
 def next_pass(lon, lat, alt, s):
@@ -143,10 +154,15 @@ def next_pass(lon, lat, alt, s):
         return track.Observer(sat = s, loc = (lon, lat, alt), tle_file = TLE_FILE).get_next_pass()
     except KeyError:
         return sat_not_found
+    except requests.exceptions.HTTPError:
+        return ip_request_failed 
 
 @api.route('/api/get_next_pass/<float:lon>,<float:lat>,<float:alt>')
 def next_pass_with_loc(lon, lat, alt):
-    return track.Observer(loc = (lon, lat, alt), tle_file = TLE_FILE).get_next_pass()
+    try:
+        return track.Observer(loc = (lon, lat, alt), tle_file = TLE_FILE).get_next_pass()
+    except requests.exceptions.HTTPError:
+        return ip_request_failed 
 
 @api.route('/api/get_next_pass/<string:s>')
 def next_pass_with_sat(s):
@@ -154,10 +170,15 @@ def next_pass_with_sat(s):
         return track.Observer(sat = s, tle_file = TLE_FILE).get_next_pass()
     except KeyError:
         return sat_not_found
+    except requests.exceptions.HTTPError:
+        return ip_request_failed 
 
 @api.route('/api/get_next_pass')
 def next_pass_default():
-    return track.Observer(tle_file = TLE_FILE).get_next_pass()
+    try:
+        return track.Observer(tle_file = TLE_FILE).get_next_pass()
+    except requests.exceptions.HTTPError:
+        return ip_request_failed 
 
 @api.route('/api/number_exists/<string:number>')
 def number_exists(number):

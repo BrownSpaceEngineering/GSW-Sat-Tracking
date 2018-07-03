@@ -34,14 +34,18 @@ def update_TLE():
         tle_file.write(r.read().decode('utf-8'))
 
 def get_ip_loc():
-    url = 'http://freegeoip.net/json'
+    url = 'http://ipinfo.io/json'
     r = requests.get(url)
+    if(r.status_code != requests.codes.ok):
+        return (0,0,0), False
     j = json.loads(r.text)
-    lat = j['latitude']
-    lon = j['longitude']
+    location = j['loc']
+    # We receive the location as a "lat,lon" string, with values separated by a comma
+    lat = location.split(',')[0]
+    lon = location.split(',')[1]
     # print("latitude: " + str(lat))
     # print("longitude: " + str(lon))
-    return (lon,lat,0)
+    return (lon,lat,0), True
 
 def get_ISS_loc():
     url = "http://api.open-notify.org/iss-now.json"
