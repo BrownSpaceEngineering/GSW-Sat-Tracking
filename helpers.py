@@ -5,14 +5,19 @@ import json
 import urllib
 import threading, atexit
 import ephem
+import re
 
 DEFAULT_TLE_FILE = "equisat-tle.txt"
 TLE_UPDATE_PERIOD_S = 3*60*60
+tle_update_timer = None
+EQUISAT_TLE = ""
+
 
 def convert_ephem_float_to_date(float_date):
     return ephem.Date(float_date)
 
 def update_TLE():
+    extractEQUiSatTLE()
     with open(DEFAULT_TLE_FILE, 'w') as tle_file:
         # Make file blank
         tle_file.truncate(0)
@@ -79,6 +84,16 @@ def stop_update_tle_daemon():
 def start_update_tle_daemon():
     update_tle_cb()
     atexit.register(stop_update_tle_daemon)
+
+def extractEQUiSatTLE():    
+    with open(DEFAULT_TLE_FILE, 'r') as tle_file:        
+        tles_str = tle_file.read()
+        equisat_tle = re.search("EQUISAT(.*\n){3}", tles_str)        
+        if (equisat_tle == None):            
+            equisat_tle = re.search("ISS \(ZARYA\)(.*\n){3}", tles_str)            
+        if (equisat_tle):
+            with open("equisat-tle.txt", "w+") as equisat_tle_file:
+                equisat_tle_file.write(equisat_tle.group()[:-1]) 
 
 if __name__ == '__main__':
     print("updating tle")

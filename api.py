@@ -3,11 +3,13 @@ import client
 import datetime
 import helpers
 from flask import Flask, jsonify, send_from_directory
+from flask_cors import CORS
 import json
 from helpers import DEFAULT_TLE_FILE
 from werkzeug.routing import FloatConverter as BaseFloatConverter
 
 api = Flask(__name__, static_folder="./")
+CORS(api)
 
 class FloatConverter(BaseFloatConverter):
     regex = r'-?\d+(\.\d+)?'
@@ -20,7 +22,8 @@ guide_path = './docs/index.html'
 
 # tle file customization. Static file will not be auto-updated, default will be.
 USE_STATIC_TLE_FILE = False
-STATIC_TLE_FILE = "equisat-tle.txt"
+STATIC_TLE_FILE = "equisat-tle-static.txt"
+EQUISAT_TLE_FILE = "equisat-tle.txt"
 TLE_FILE = STATIC_TLE_FILE if USE_STATIC_TLE_FILE else DEFAULT_TLE_FILE
 
 # API User Guide
@@ -31,8 +34,16 @@ def api_guide():
 # Trackers
 @api.route('/api/tle')
 @api.route('/api/Amateur.tle')
-def equisat_tle():
+@api.route('/api/amateur.tle')
+@api.route('/api/Amateur.txt')
+@api.route('/api/amateur.txt')
+@api.route('/api/tle.txt')
+def send_tles():
     return api.send_static_file(TLE_FILE)
+
+@api.route('/api/equisat_tle')
+def equisat_tle():
+    return api.send_static_file(EQUISAT_TLE_FILE)
 
 @api.route('/api/get_time')
 def time():
