@@ -111,7 +111,7 @@ class Tracker:
 class Observer:
     _time = staticmethod(time)
     def_sat = DEFAULT_SAT
-    ip_loc = get_ip_loc()
+    ip_loc = (0,0,0)#get_ip_loc()
 
     def __init__(self, sat = def_sat, loc = ip_loc, tle_file = DEFAULT_TLE_FILE):
         self.sat = sat

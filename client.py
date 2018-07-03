@@ -38,12 +38,8 @@ from collections import OrderedDict
 import threading
 from datetime import datetime
 import time
-<<<<<<< HEAD
 import portalocker
-import helpers
-=======
 import atexit
->>>>>>> newbranch
 
 account_sid = "ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 # Your Auth Token from twilio.com/console
