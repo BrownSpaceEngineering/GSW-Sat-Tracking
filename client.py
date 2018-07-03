@@ -38,6 +38,7 @@ from collections import OrderedDict
 import threading
 from datetime import datetime
 import time
+import atexit
 
 account_sid = "ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 # Your Auth Token from twilio.com/console
@@ -59,7 +60,6 @@ class PhoneClient:
                     ])
                 return json.dumps(d)
 
-    # is location lon lat alt or lat lon alt
     def register_number(self, number, lat, lon):
         with open('phoneDB.csv', 'r') as f:
             reader = csv.DictReader(f)
@@ -71,40 +71,41 @@ class PhoneClient:
         with open('phoneDB.csv', 'a') as f:
             writer = csv.DictWriter(f, fieldnames=fieldnames)         
             writer.writerow({'number': number, 'lat': lat, 'lon':lon})   
-            #message = client.messages.create(to=number,from_=gsw_num,body="Registered! We are tracking u fam. reply STOP and we wont stalk")
+            #message = client.messages.create(to=number,from_=gsw_num,body="Registered! We are tracking u")
 
         return True
 
 class DatabaseMonitor:
-
+    database_monitor_timer = None
     def send_sms(self, number):
         print("sending message to %s\n", number)
-        #message = client.messages.create(to=number,from_=gsw_num,body="Satellite incoming i love science")
+        #message = client.messages.create(to=number,from_=gsw_num,body="Satellite over horizon rn")
 
     def search_database(self):
         print("Search db")
-        while True:
-            with open('phoneDB.csv', 'r') as f:
-                reader = csv.DictReader(f)
-                #lock file
-                for row in reversed(list(reader)):
-                    #sat = 'ISS (ZARYA)', loc = (int(row['lon']), int(row['lat']), 0)
-                    pass_info = track.Observer(loc = (int(row['lon']), int(row['lat']), 0)).get_next_pass()
-                    pass_dictionary = json.loads(pass_info)
-                    ephem_date = convert_ephem_float_to_date(pass_dictionary['rise_time'])
-                    rise_time = datetime.strptime(str(ephem_date), "%Y/%m/%d %H:%M:%S")
-                    minutes_diff = (rise_time - datetime.now()).total_seconds() / 60
-                    print(minutes_diff)
-                    if minutes_diff < 5:
-                        send_sms(row['number'])
-            time.sleep(10)
+        
+        with open('phoneDB.csv', 'r') as f:
+            reader = csv.DictReader(f)
+            #We need to lock this file here
+            for row in reversed(list(reader)):
+                pass_info = track.Observer(loc = (float(row['lon']), float(row['lat']), 0)).get_next_pass()
+                pass_dictionary = json.loads(pass_info)
+                rise_time = convert_unix_time_to_date(pass_dictionary['rise_time'])
+                minutes_diff = (rise_time - datetime.now()).total_seconds() / 60
+                print(minutes_diff, row['number'])
+                if minutes_diff < 5:
+                    send_sms(row['number'])
+        database_monitor_timer = threading.Timer(5, self.search_database)
+        database_monitor_timer.setDaemon(True)
+        database_monitor_timer.start()
 
-    def start_timer(self):
-        t = threading.Thread(target=self.search_database)
-        t.start()
+    #def stop_database_monitor(self):
+        #if database_monitor_timer is not None:   
 
+    def start_database_monitor(self):
+        self.search_database()
+        #atexit.register(self.stop_database_monitor)      
+        #t = threading.Thread(target=self.search_database)
+        #t.start()
 
-DatabaseMonitor().start_timer();
-
-#PhoneClient().register_number(1,5,4)
-#print(PhoneClient().get_loc_info("1"))
+#DatabaseMonitor().start_database_monitor()
