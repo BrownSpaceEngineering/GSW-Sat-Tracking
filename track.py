@@ -132,14 +132,12 @@ class Observer:
         return json.dumps(d)
 
     def get_next_pass(self):
-        tle = get_TLE(self.sat)
-        print(tle)
+        tle = get_TLE(self.sat)        
         sat = ephem.readtle(tle[0], tle[1], tle[2])
-        print(tle)
         obs = ephem.Observer()        
         lon, lat, el = self.loc
         obs.lon, obs.lat, obs.elevation = str(lon), str(lat), 0
-        passData = obs.next_pass(sat)
+        passData = obs.next_pass(sat)        
         # next_pass returns a six-element tuple giving:
         # (dates are in UTC)
         # 0  Rise time
@@ -150,8 +148,7 @@ class Observer:
         # 5  Set azimuth
         # date info: http://rhodesmill.org/pyephem/date
         # next_pass info:
-        # https://github.com/brandon-rhodes/pyephem/blob/592ecff661adb9c5cbed7437a23d705555d7ce57/libastro-3.7.7/riset_cir.c#L17
-        print(passData[0])
+        # https://github.com/brandon-rhodes/pyephem/blob/592ecff661adb9c5cbed7437a23d705555d7ce57/libastro-3.7.7/riset_cir.c#L17        
         d = OrderedDict([
             ('rise_time', ephem_to_unix(passData[0])),
             ('rise_azimuth', math.degrees(passData[1])),
@@ -167,7 +164,6 @@ class Observer:
 if __name__ == "__main__":
     t = Tracker()
     o = Observer(sat="ISS (ZARYA)", loc=(-71.3991,41.8391,0))
-
     d = json.loads(o.get_next_pass())
     print(d)
     #print(t.get_time(), t.get_velocity_vector(), t.get_velocity(), t.get_lonlatalt(), o.get_az_el(), o.get_next_pass(), sep="\n")

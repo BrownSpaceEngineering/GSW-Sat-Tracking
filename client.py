@@ -123,7 +123,7 @@ class DatabaseMonitor:
                 minutes_diff = (rise_time - datetime.utcnow()).total_seconds() / 60
                 # If there's less than five minutes to go before the satellite's next pass, send the info
                 if minutes_diff < 5:
-                    send_sms(row['number'])
+                    send_sms(row['number']) 
         # Restart this again in five minutes.
         self.database_monitor_timer = threading.Timer(5*60*60, self.search_database)
         self.database_monitor_timer.setDaemon(True)
