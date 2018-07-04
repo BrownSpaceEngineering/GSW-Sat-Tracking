@@ -7,7 +7,7 @@ from flask_cors import CORS
 import json
 from helpers import DEFAULT_TLE_FILE
 from werkzeug.routing import FloatConverter as BaseFloatConverter
-
+import requests
 api = Flask(__name__, static_folder="./")
 CORS(api)
 
@@ -196,5 +196,5 @@ def update_tle():
     return json.dumps({"updated_time": time})
 
 if __name__ == '__main__':
-    helpers.start_update_tle_daemon()
+    #helpers.start_update_tle_daemon()
     api.run(debug = False, host = '0.0.0.0', port = 80)
