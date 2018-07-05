@@ -182,11 +182,11 @@ def next_pass_default():
 
 @api.route('/api/number_exists/<string:number>')
 def number_exists(number):
-    return client.get_loc_info(number)
+    return client.PhoneClient().get_loc_info(number)
 
 @api.route('/api/register/<string:number>,<float:lat>,<float:lon>')
 def register_phone(number,lat,lon):
-    return client.register_phone(number, lat, lon)
+    return client.PhoneClient().register_number(number, lat, lon)
 
 # Maual maintenance
 @api.route('/api/update')
@@ -197,5 +197,5 @@ def update_tle():
 
 if __name__ == '__main__':
     helpers.start_update_tle_daemon()
-    client.start_database_monitor()
+    client.DatabaseMonitor().start_database_monitor()
     api.run(debug = False, host = '0.0.0.0', port = 80)

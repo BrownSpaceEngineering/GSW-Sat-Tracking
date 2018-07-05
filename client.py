@@ -63,13 +63,14 @@ class PhoneClient:
         with open('phoneDB.csv', 'r') as f:
             reader = csv.DictReader(f)
             for row in reversed(list(reader)):
-                if row['number'] is number:
+                if row['number'] == number:
                     d = OrderedDict([
-                        ('number', row['number']),
+                        ('exists', True),
                         ('lon', row['lon']),
                         ('lat', row['lat'])
                     ])
-                return json.dumps(d)
+                    return json.dumps(d)
+            return json.dumps(OrderedDict([('exists', False), ('lon', None), ('lat', None)]))
 
     # Write the number into the database. CURRENT BEHAVIOR: This will not actually
     # remove a client's old number from the database.
@@ -96,7 +97,7 @@ class PhoneClient:
             # and then unlock, and send a message to the client.
             portalocker.unlock(f)
             message = client.messages.create(to=number,from_=gsw_num,body="You're registered! We'll let you know when to look up!")
-        return True
+        return json.dumps(OrderedDict([('success', True)]))
 
 class DatabaseMonitor:
     
@@ -123,7 +124,7 @@ class DatabaseMonitor:
                 minutes_diff = (rise_time - datetime.utcnow()).total_seconds() / 60
                 # If there's less than five minutes to go before the satellite's next pass, send the info
                 if minutes_diff < 5:
-                    send_sms(row['number']) 
+                    self.send_sms(row['number']) 
         # Restart this again in five minutes.
         self.database_monitor_timer = threading.Timer(5*60*60, self.search_database)
         self.database_monitor_timer.setDaemon(True)
