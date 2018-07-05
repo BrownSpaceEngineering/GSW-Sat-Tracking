@@ -40,6 +40,7 @@ from datetime import datetime
 import time
 import portalocker
 import atexit
+import sqlite3
 
 # Test credentials. These will not actually perform actions,
 # but will display errors/success messages as if they had.
@@ -52,7 +53,6 @@ account_sid = "AC81a035986f6be6decd80e773e934a0cd"
 auth_token  = "112cf07ffc4eba703e60d3082f38253d"
 gsw_num = "+19495183818"
 client = Client(account_sid, auth_token)
-fieldnames = ['number', 'lat', 'lon']
 
 # Note that numbers must be in the format "+12345678". No parenthesis or dashes, 
 # and we need the plus sign at the beginning.
@@ -60,44 +60,38 @@ class PhoneClient:
     
     # Open the phone database and check if it already contains the given number. 
     def get_loc_info(self, number):
-        with open('phoneDB.csv', 'r') as f:
-            reader = csv.DictReader(f)
-            for row in reversed(list(reader)):
-                if row['number'] == number:
-                    d = OrderedDict([
-                        ('exists', True),
-                        ('lon', row['lon']),
-                        ('lat', row['lat'])
+        conn = sqlite3.connect('phoneDb.db')
+        c = conn.cursor()
+        search = (number,)
+        c.execute('SELECT lat,lon FROM phones WHERE number = ?', search)
+        res = c.fetchone()
+        conn.commit()
+        conn.close()
+        # Return None if there's no number match in the database
+        if(res == None):
+            return None
+        else:
+            lat, lon = res
+            d = OrderedDict([
+                        ('number', number),
+                        ('lon', lon),
+                        ('lat', lat)
                     ])
-                    return json.dumps(d)
-            return json.dumps(OrderedDict([('exists', False), ('lon', None), ('lat', None)]))
+            return d
 
-    # Write the number into the database. CURRENT BEHAVIOR: This will not actually
-    # remove a client's old number from the database.
+    # Write the number into the database. 
     def register_number(self, number, lat, lon):
-        print("registering number")
-        with open('phoneDB.csv', 'r') as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                # We send a message to the number if it already exists in the database.
-                # The current behavior has us still write the number with the new location
-                # into the database, though.
-                if row['number'] == number:
-                    message = client.messages.create(to=number,from_=gsw_num,body="Warning, this number is already in the database.")
-                    break
-        # Add the information to the database.
-        with open('phoneDB.csv', 'a') as f:
-            #self.validate_new_number(number)
-
-            # We put a write lock on the database, so that the Database Monitor can't 
-            # read from the DB while we're writing a new number into it.
-            portalocker.lock(f, portalocker.LOCK_EX)
-            writer = csv.DictWriter(f, fieldnames=fieldnames)         
-            writer.writerow({'number': number, 'lat': lat, 'lon':lon})   
-            # and then unlock, and send a message to the client.
-            portalocker.unlock(f)
-            message = client.messages.create(to=number,from_=gsw_num,body="You're registered! We'll let you know when to look up!")
-        return json.dumps(OrderedDict([('success', True)]))
+        does_number_exist = self.get_loc_info(number)
+        conn = sqlite3.connect('phoneDb.db')
+        c = conn.cursor()
+        if(does_number_exist != None):
+            # The number already exists, so we send a warning before deleting + rewriting
+            message = client.messages.create(to=number,from_=gsw_num,body="Warning, this number is already in the database.")
+            search = (number,)
+            c.execute('DELETE FROM phones WHERE number = ?', search)
+        c.execute('INSERT INTO phones VALUES (?,?,?)', (number, lat, lon))
+        conn.commit()
+        conn.close()
 
 class DatabaseMonitor:
     
@@ -111,20 +105,25 @@ class DatabaseMonitor:
     # Search database periodically to see if the satellite will be in sight of any of the locations within
     # the next five minutes.
     def search_database(self):
-        with open('phoneDB.csv', 'r') as f:
-            reader = csv.DictReader(f)
-            # Because we don't currently remove numbers from the database, for now we read the database
-            # from the bottom up, as the newer entries are on the bottom. For now.
-            for row in reversed(list(reader)):
-                pass_info = track.Observer(loc = (float(row['lon']), float(row['lat']), 0)).get_next_pass()
-                pass_dictionary = json.loads(pass_info)
-                rise_time = convert_unix_time_to_date(pass_dictionary['rise_time'])
-                # note that rise_time should be in UTC time. We don't want to have half our numbers in local 
-                # time and the other half in UTC.
-                minutes_diff = (rise_time - datetime.utcnow()).total_seconds() / 60
-                # If there's less than five minutes to go before the satellite's next pass, send the info
-                if minutes_diff < 5:
-                    self.send_sms(row['number']) 
+        conn = sqlite3.connect('phoneDb.db')
+        c = conn.cursor()
+        c.execute('SELECT * FROM phones');
+        data = c.fetchall()
+        for row in data:
+            num = row[0]
+            lat = row[1]
+            lon = row[2]
+            pass_info = track.Observer(loc = (float(lon), float(lat), 0)).get_next_pass_data()
+            rise_time = pass_info[0]
+            curr_time = datetime.utcnow()
+            # note that rise_time should be in UTC time. We don't want to have half our numbers in local 
+            # time and the other half in UTC.
+            minutes_diff = (rise_time.datetime() - curr_time).total_seconds() / 60
+            # If there's less than five minutes to go before the satellite's next pass, send the info
+            if minutes_diff < 5:
+                self.send_sms(number) 
+        conn.commit()
+        conn.close()
         # Restart this again in five minutes.
         self.database_monitor_timer = threading.Timer(5*60*60, self.search_database)
         self.database_monitor_timer.setDaemon(True)
@@ -139,5 +138,6 @@ class DatabaseMonitor:
         self.search_database()
         atexit.register(self.stop_database_monitor)      
 
+#PhoneClient().register_number("+12345", "2", "3")
 #PhoneClient().register_number("+15106763627", 15, 300)
-#DatabaseMonitor().start_database_monitor()
+#DatabaseMonitor().search_database()

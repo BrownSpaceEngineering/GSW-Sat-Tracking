@@ -132,12 +132,7 @@ class Observer:
         return json.dumps(d)
 
     def get_next_pass(self):
-        tle = get_TLE(self.sat)        
-        sat = ephem.readtle(tle[0], tle[1], tle[2])
-        obs = ephem.Observer()        
-        lon, lat, el = self.loc
-        obs.lon, obs.lat, obs.elevation = str(lon), str(lat), 0
-        passData = obs.next_pass(sat)        
+        passData = self.get_next_pass_data()
         # next_pass returns a six-element tuple giving:
         # (dates are in UTC)
         # 0  Rise time
@@ -160,6 +155,14 @@ class Observer:
         
         return json.dumps(d)
 
+    def get_next_pass_data(self):
+        tle = get_TLE(self.sat)        
+        sat = ephem.readtle(tle[0], tle[1], tle[2])
+        obs = ephem.Observer()        
+        lon, lat, el = self.loc
+        obs.lon, obs.lat, obs.elevation = str(lon), str(lat), 0
+        passData = obs.next_pass(sat)    
+        return passData
 
 if __name__ == "__main__":
     t = Tracker()
