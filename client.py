@@ -92,6 +92,7 @@ class PhoneClient:
         c.execute('INSERT INTO phones VALUES (?,?,?)', (number, lat, lon))
         conn.commit()
         conn.close()
+        return True
 
 class DatabaseMonitor:
     

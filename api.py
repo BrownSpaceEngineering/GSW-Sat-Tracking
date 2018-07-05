@@ -8,6 +8,8 @@ import json
 from helpers import DEFAULT_TLE_FILE
 from werkzeug.routing import FloatConverter as BaseFloatConverter
 import requests
+from collections import OrderedDict
+
 api = Flask(__name__, static_folder="./")
 CORS(api)
 
@@ -171,7 +173,7 @@ def next_pass_with_sat(s):
     except KeyError:
         return sat_not_found
     except requests.exceptions.HTTPError:
-        return ip_request_failed 
+        return ip_request_failed
 
 @api.route('/api/get_next_pass')
 def next_pass_default():
@@ -182,11 +184,15 @@ def next_pass_default():
 
 @api.route('/api/number_exists/<string:number>')
 def number_exists(number):
-    return client.PhoneClient().get_loc_info(number)
+    res = client.PhoneClient().get_loc_info(number)
+    if (res):
+        return json.dumps(res)
+    else:
+        return json.dumps(OrderedDict([('number', None)]))
 
 @api.route('/api/register/<string:number>,<float:lat>,<float:lon>')
 def register_phone(number,lat,lon):
-    return client.PhoneClient().register_number(number, lat, lon)
+    return json.dumps(OrderedDict([('success', client.PhoneClient().register_number(number, lat, lon))]))
 
 # Maual maintenance
 @api.route('/api/update')
