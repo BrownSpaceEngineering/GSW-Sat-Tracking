@@ -194,10 +194,6 @@ def number_exists(number):
 def register_phone(number,lat,lon):
     return json.dumps(OrderedDict([('success', client.PhoneClient().register_number(number, lat, lon))]))
 
-@api.route('/api/register/<string:number>')
-def unregister_phone(number):
-    return json.dumps(OrderedDict([('success', client.PhoneClient().unregister_number(number, lat, lon))]))
-
 # Maual maintenance
 @api.route('/api/update')
 def update_tle():

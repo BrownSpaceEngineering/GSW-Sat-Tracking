@@ -94,19 +94,6 @@ class PhoneClient:
         conn.close()
         return True
 
-    def unregister_number(self, number):
-        does_number_exist = self.get_loc_info(number)
-        conn = sqlite3.connect('phoneDb.db')
-        c = conn.cursor()
-        if(does_number_exist != None):
-            # The number already exists, so we send a warning before deleting + rewriting
-            message = client.messages.create(to=number,from_=gsw_num,body="Your number was removed from our database.")
-            search = (number,)
-            c.execute('DELETE FROM phones WHERE number = ?', search)
-        conn.commit()
-        conn.close()
-        return True
-
 class DatabaseMonitor:
     
     def __init__(self):
