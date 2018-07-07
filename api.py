@@ -2,7 +2,7 @@ import track
 import client
 import datetime
 import helpers
-from flask import Flask, jsonify, send_from_directory
+from flask import Flask, jsonify, send_from_directory, request
 from flask_cors import CORS
 import json
 from helpers import DEFAULT_TLE_FILE
@@ -194,12 +194,12 @@ def number_exists(number):
 def register_phone(number,lat,lon):
     return json.dumps(OrderedDict([('success', client.PhoneClient().register_number(number, lat, lon))]))
 
-# Twilio will send incoming messages to our server, if we're deployed.
 @api.route('/sms', methods=['GET', 'POST'])
 def sms():
     number = request.form['From']
     message_body = request.form['Body']
-    return client.PhoneClient().unregister(number, message_body)
+    return json.dumps(OrderedDict([('success', client.PhoneClient().unregister_number(number, message_body))]))
+
 
 # Maual maintenance
 @api.route('/api/update')

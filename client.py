@@ -98,12 +98,15 @@ class PhoneClient:
         if(message == "REMOVE"):
             conn = sqlite3.connect('phoneDb.db')
             c = conn.cursor()
-            c.execute('DELETE FROM phones WHERE number = ?', number)
+            remove = (number,)
+            c.execute('DELETE FROM phones WHERE number = ?', remove)
             conn.commit()
             conn.close()
+            client.messages.create(to=number,from_=gsw_num,body="Removed phone number from database.")
             return True
+        client.messages.create(to=number,from_=gsw_num,body="Sorry, we didn't understand that message.")
         return False
-        
+
 class DatabaseMonitor:
     
     def __init__(self):
