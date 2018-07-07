@@ -194,6 +194,13 @@ def number_exists(number):
 def register_phone(number,lat,lon):
     return json.dumps(OrderedDict([('success', client.PhoneClient().register_number(number, lat, lon))]))
 
+# Twilio will send incoming messages to our server, if we're deployed.
+@api.route('/sms', methods=['GET', 'POST'])
+def sms():
+    number = request.form['From']
+    message_body = request.form['Body']
+    return client.PhoneClient().unregister(number, message_body)
+
 # Maual maintenance
 @api.route('/api/update')
 def update_tle():
@@ -202,6 +209,6 @@ def update_tle():
     return json.dumps({"updated_time": time})
 
 if __name__ == '__main__':
-    helpers.start_update_tle_daemon()
-    client.DatabaseMonitor().start_database_monitor()
+    #helpers.start_update_tle_daemon()
+    #client.DatabaseMonitor().start_database_monitor()
     api.run(debug = False, host = '0.0.0.0', port = 80)

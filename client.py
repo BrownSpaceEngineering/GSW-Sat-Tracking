@@ -94,6 +94,16 @@ class PhoneClient:
         conn.close()
         return True
 
+    def unregister_number(self, number, message):
+        if(message == "REMOVE"):
+            conn = sqlite3.connect('phoneDb.db')
+            c = conn.cursor()
+            c.execute('DELETE FROM phones WHERE number = ?', number)
+            conn.commit()
+            conn.close()
+            return True
+        return False
+        
 class DatabaseMonitor:
     
     def __init__(self):
