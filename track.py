@@ -111,13 +111,12 @@ class Tracker:
 class Observer:
     _time = staticmethod(time)
     def_sat = DEFAULT_SAT
-    ip_loc = get_ip_loc()
+    ip_loc, status = get_ip_loc()
 
     def __init__(self, sat = def_sat, loc = ip_loc, tle_file = DEFAULT_TLE_FILE):
         self.sat = sat
         self.orb = get_orbital(sat, tle_file)
-        self.loc, _ = loc
-        status = True
+        self.loc = loc
         if(status == False):
             raise requests.exceptions.HTTPError
         self.tle_file = tle_file
