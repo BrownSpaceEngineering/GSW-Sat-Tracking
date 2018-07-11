@@ -194,7 +194,7 @@ def number_exists(number):
 def register_phone(number,lat,lon):
     return json.dumps(OrderedDict([('success', client.PhoneClient().register_number(number, lat, lon))]))
 
-@api.route('/sms', methods=['GET', 'POST'])
+@api.route('/api/sms', methods=['GET', 'POST'])
 def sms():
     number = request.form['From']
     message_body = request.form['Body']

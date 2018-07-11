@@ -89,6 +89,8 @@ class PhoneClient:
             message = client.messages.create(to=number,from_=gsw_num,body="Warning, this number is already in the database.")
             search = (number,)
             c.execute('DELETE FROM phones WHERE number = ?', search)
+        else:
+            message = client.messages.create(to=number,from_=gsw_num,body="Welcome! We'll let you know when the sateliite's on the horizon.")
         c.execute('INSERT INTO phones VALUES (?,?,?)', (number, lat, lon))
         conn.commit()
         conn.close()

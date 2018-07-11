@@ -116,7 +116,7 @@ class Observer:
     def __init__(self, sat = def_sat, loc = ip_loc, tle_file = DEFAULT_TLE_FILE):
         self.sat = sat
         self.orb = get_orbital(sat, tle_file)
-        self.loc = loc
+        self.loc, _ = loc
         status = True
         if(status == False):
             raise requests.exceptions.HTTPError
