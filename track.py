@@ -38,7 +38,7 @@ import ephem
 from helpers import *
 
 DEFAULT_SAT = "ISS (ZARYA)"
-
+now = ephem.now()
 class Tracker:
     _time = staticmethod(time)
     def_sat = DEFAULT_SAT

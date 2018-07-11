@@ -36,7 +36,7 @@ from helpers import *
 import csv
 from collections import OrderedDict
 import threading
-from datetime import datetime
+from datetime import datetime, timedelta
 import time
 import portalocker
 import atexit
@@ -118,6 +118,9 @@ class DatabaseMonitor:
         print("sending message to %s\n", number)
         message = client.messages.create(to=number,from_=gsw_num,body="The satellite's almost over your horizon. Keep your eyes peeled!")
 
+    def test_search(self):
+        #PhoneClient().register_number("+15106763627", 0, 0)
+        self.search_database()
     # Search database periodically to see if the satellite will be in sight of any of the locations within
     # the next five minutes.
     def search_database(self):
@@ -130,18 +133,18 @@ class DatabaseMonitor:
             lat = row[1]
             lon = row[2]
             pass_info = track.Observer(loc = (float(lon), float(lat), 0)).get_next_pass_data()
-            rise_time = pass_info[0]
+            rise_time = pass_info[0] 
             curr_time = datetime.utcnow()
             # note that rise_time should be in UTC time. We don't want to have half our numbers in local 
             # time and the other half in UTC.
             minutes_diff = (rise_time.datetime() - curr_time).total_seconds() / 60
             # If there's less than five minutes to go before the satellite's next pass, send the info
-            if minutes_diff < 5:
-                self.send_sms(number) 
+            if minutes_diff < 5 and minutes_diff > -1:
+                self.send_sms(num) 
         conn.commit()
         conn.close()
         # Restart this again in five minutes.
-        self.database_monitor_timer = threading.Timer(5*60*60, self.search_database)
+        self.database_monitor_timer = threading.Timer(60, self.search_database)
         self.database_monitor_timer.setDaemon(True)
         self.database_monitor_timer.start()
 
@@ -156,4 +159,4 @@ class DatabaseMonitor:
 
 #PhoneClient().register_number("+12345", "2", "3")
 #PhoneClient().register_number("+15106763627", 15, 300)
-#DatabaseMonitor().search_database()
+#DatabaseMonitor().test_search()
