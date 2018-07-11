@@ -38,7 +38,7 @@ def get_ip_loc():
     url = 'http://ipinfo.io/json'
     r = requests.get(url)
     if(r.status_code != requests.codes.ok):
-        return (0,0,0), False
+        return None, False
     j = json.loads(r.text)
     location = j['loc']
     # We receive the location as a "lat,lon" string, with values separated by a comma
