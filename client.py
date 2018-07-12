@@ -113,14 +113,14 @@ class DatabaseMonitor:
     
     def __init__(self):
         self.database_monitor_timer = None
-    
+        self.already_notified = {}
     def send_sms(self, number):
         print("sending message to %s\n", number)
         message = client.messages.create(to=number,from_=gsw_num,body="The satellite's almost over your horizon. Keep your eyes peeled!")
 
     def test_search(self):
-        #PhoneClient().register_number("+15106763627", 0, 0)
         self.search_database()
+        
     # Search database periodically to see if the satellite will be in sight of any of the locations within
     # the next five minutes.
     def search_database(self):
@@ -132,6 +132,8 @@ class DatabaseMonitor:
             num = row[0]
             lat = row[1]
             lon = row[2]
+            if num not in self.already_notified:
+                self.already_notified[num] = False
             pass_info = track.Observer(loc = (float(lon), float(lat), 0)).get_next_pass_data()
             rise_time = pass_info[0] 
             curr_time = datetime.utcnow()
@@ -140,7 +142,11 @@ class DatabaseMonitor:
             minutes_diff = (rise_time.datetime() - curr_time).total_seconds() / 60
             # If there's less than five minutes to go before the satellite's next pass, send the info
             if minutes_diff < 5 and minutes_diff > -1:
-                self.send_sms(num) 
+                if self.already_notified[num] == False:
+                    self.already_notified[num] = True
+                    self.send_sms(num) 
+            else:
+                self.already_notified[num] = False
         conn.commit()
         conn.close()
         # Restart this again in five minutes.
