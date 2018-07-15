@@ -41,6 +41,7 @@ import time
 import portalocker
 import atexit
 import sqlite3
+import pytz
 
 # Test credentials. These will not actually perform actions,
 # but will display errors/success messages as if they had.
@@ -84,16 +85,13 @@ class PhoneClient:
         does_number_exist = self.get_loc_info(number)
         conn = sqlite3.connect('phoneDb.db')
         c = conn.cursor()
-        if(does_number_exist != None):
-            # The number already exists, so we send a warning before deleting + rewriting
-            message = client.messages.create(to=number,from_=gsw_num,body="Warning, this number is already in the database.")
+        if(does_number_exist != None):                    
             search = (number,)
-            c.execute('DELETE FROM phones WHERE number = ?', search)
-        else:
-            message = client.messages.create(to=number,from_=gsw_num,body="Welcome! We'll let you know when the sateliite's on the horizon.")
+            c.execute('DELETE FROM phones WHERE number = ?', search)        
         c.execute('INSERT INTO phones VALUES (?,?,?)', (number, lat, lon))
         conn.commit()
         conn.close()
+        message = client.messages.create(to=number,from_=gsw_num,body="Thanks for registering for EQUiSat pass notifications for (" + str(lat) + ", " + str(lon) + "). Reply with REMOVE at any time to unsubscribe.")
         return True
 
     def unregister_number(self, number, message):
@@ -104,9 +102,8 @@ class PhoneClient:
             c.execute('DELETE FROM phones WHERE number = ?', remove)
             conn.commit()
             conn.close()
-            client.messages.create(to=number,from_=gsw_num,body="Removed phone number from database.")
-            return True
-        client.messages.create(to=number,from_=gsw_num,body="Sorry, we didn't understand that message.")
+            client.messages.create(to=number,from_=gsw_num,body="You've been unsubscribed from SMS notifications.")
+            return True        
         return False
 
 class DatabaseMonitor:
@@ -114,16 +111,24 @@ class DatabaseMonitor:
     def __init__(self):
         self.database_monitor_timer = None
         self.already_notified = {}
-    def send_sms(self, number):
-        print("sending message to %s\n", number)
-        message = client.messages.create(to=number,from_=gsw_num,body="The satellite's almost over your horizon. Keep your eyes peeled!")
+    def send_sms(self, number, pass_info, num_minutes):        
+        print("sending message to " + number)
+        fmt = '%Y-%m-%d %I:%M %p %Z'
+        messageBody = "EQUiSat is coming over your horizon in " + str(num_minutes) + " minutes!" \
+        + "\nRise Time: " + str(datetime.utcfromtimestamp(pass_info['rise_time']).replace(tzinfo=pytz.UTC).strftime(fmt)) \
+        + "\nRise Azimuth: " + '%.2f' % pass_info['rise_azimuth'] + "°" \
+        + "\nMax Altitude Time: " + str(datetime.utcfromtimestamp(pass_info['max_alt_time']).replace(tzinfo=pytz.UTC).strftime(fmt)) \
+        + "\nMax Altitude: " + '%.2f' % pass_info['max_alt'] + "°" \
+        + "\nSet Time: " + str(datetime.utcfromtimestamp(pass_info['set_time']).replace(tzinfo=pytz.UTC).strftime(fmt)) \
+        + "\nSet Azimuth: " + '%.2f' % pass_info['set_azimuth'] + "°"        
+        message = client.messages.create(to=number,from_=gsw_num,body=messageBody)
 
     def test_search(self):
         self.search_database()
         
     # Search database periodically to see if the satellite will be in sight of any of the locations within
     # the next five minutes.
-    def search_database(self):
+    def search_database(self):        
         conn = sqlite3.connect('phoneDb.db')
         c = conn.cursor()
         c.execute('SELECT * FROM phones');
@@ -134,17 +139,17 @@ class DatabaseMonitor:
             lon = row[2]
             if num not in self.already_notified:
                 self.already_notified[num] = False
-            pass_info = track.Observer(loc = (float(lon), float(lat), 0)).get_next_pass_data()
-            rise_time = pass_info[0] 
+            pass_info = track.Observer(loc = (float(lon), float(lat), 0)).get_next_pass()
+            rise_time = datetime.utcfromtimestamp(pass_info['rise_time'])
             curr_time = datetime.utcnow()
             # note that rise_time should be in UTC time. We don't want to have half our numbers in local 
             # time and the other half in UTC.
-            minutes_diff = (rise_time.datetime() - curr_time).total_seconds() / 60
-            # If there's less than five minutes to go before the satellite's next pass, send the info
-            if minutes_diff < 5 and minutes_diff > -1:
+            minutes_diff = (rise_time - curr_time).total_seconds() / 60
+            # If there's less than five minutes to go before the satellite's next pass, send the info            
+            if minutes_diff < 5 and minutes_diff > -1:                
                 if self.already_notified[num] == False:
                     self.already_notified[num] = True
-                    self.send_sms(num) 
+                    self.send_sms(num, pass_info, int(minutes_diff)) 
             else:
                 self.already_notified[num] = False
         conn.commit()

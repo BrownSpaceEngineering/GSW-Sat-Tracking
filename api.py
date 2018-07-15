@@ -153,7 +153,8 @@ def az_el_default():
 @api.route('/api/get_next_pass/<string:s>/<float:lon>,<float:lat>,<float:alt>')
 def next_pass(lon, lat, alt, s):
     try:
-        return track.Observer(sat = s, loc = (lon, lat, alt), tle_file = TLE_FILE).get_next_pass()
+        pass_info = track.Observer(sat = s, loc = (lon, lat, alt), tle_file = TLE_FILE).get_next_pass()
+        return json.dumps(pass_info)
     except KeyError:
         return sat_not_found
     except requests.exceptions.HTTPError:
@@ -162,14 +163,16 @@ def next_pass(lon, lat, alt, s):
 @api.route('/api/get_next_pass/<float:lon>,<float:lat>,<float:alt>')
 def next_pass_with_loc(lon, lat, alt):
     try:
-        return track.Observer(loc = (lon, lat, alt), tle_file = TLE_FILE).get_next_pass()
+        pass_info = track.Observer(loc = (lon, lat, alt), tle_file = TLE_FILE).get_next_pass()
+        return json.dumps(pass_info)
     except requests.exceptions.HTTPError:
         return ip_request_failed 
 
 @api.route('/api/get_next_pass/<string:s>')
 def next_pass_with_sat(s):
     try:
-        return track.Observer(sat = s, tle_file = TLE_FILE).get_next_pass()
+        pass_info = track.Observer(sat = s, tle_file = TLE_FILE).get_next_pass()
+        return json.dumps(pass_info)
     except KeyError:
         return sat_not_found
     except requests.exceptions.HTTPError:
@@ -178,7 +181,8 @@ def next_pass_with_sat(s):
 @api.route('/api/get_next_pass')
 def next_pass_default():
     try:
-        return track.Observer(tle_file = TLE_FILE).get_next_pass()
+        pass_info = track.Observer(tle_file = TLE_FILE).get_next_pass()
+        return json.dumps(pass_infos)
     except requests.exceptions.HTTPError:
         return ip_request_failed 
 

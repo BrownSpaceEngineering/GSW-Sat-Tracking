@@ -152,7 +152,7 @@ class Observer:
             ('set_azimuth', math.degrees(passData[5]))
         ])
         
-        return json.dumps(d)
+        return d
 
     def get_next_pass_data(self):
         tle = get_TLE(self.sat)        
@@ -166,6 +166,6 @@ class Observer:
 if __name__ == "__main__":
     t = Tracker()
     o = Observer(sat="ISS (ZARYA)", loc=(-71.3991,41.8391,0))
-    d = json.loads(o.get_next_pass())
+    d = o.get_next_pass()
     print(d)
     #print(t.get_time(), t.get_velocity_vector(), t.get_velocity(), t.get_lonlatalt(), o.get_az_el(), o.get_next_pass(), sep="\n")
