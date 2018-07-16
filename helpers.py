@@ -20,8 +20,7 @@ def convert_ephem_float_to_date(float_date):
 def convert_unix_time_to_date(float_date):
     return datetime.fromtimestamp(float_date)
 
-def update_TLE():
-    extractEQUiSatTLE()
+def update_TLE():    
     with open(DEFAULT_TLE_FILE, 'w') as tle_file:
         # Make file blank
         tle_file.truncate(0)
@@ -33,6 +32,7 @@ def update_TLE():
         url = "https://www.celestrak.com/NORAD/elements/cubesat.txt"
         r = urllib.request.urlopen(url)
         tle_file.write(r.read().decode('utf-8'))
+    extractEQUiSatTLE()
 
 def get_ip_loc():
     url = 'http://ipinfo.io/json'
@@ -91,7 +91,7 @@ def start_update_tle_daemon():
     update_tle_cb()
     atexit.register(stop_update_tle_daemon)
 
-def extractEQUiSatTLE():    
+def extractEQUiSatTLE():
     with open(DEFAULT_TLE_FILE, 'r') as tle_file:        
         tles_str = tle_file.read()
         equisat_tle = re.search("EQUISAT(.*\n){3}", tles_str)        
