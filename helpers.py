@@ -32,6 +32,10 @@ def update_TLE():
         url = "https://www.celestrak.com/NORAD/elements/cubesat.txt"
         r = urllib.request.urlopen(url)
         tle_file.write(r.read().decode('utf-8'))
+        # New TLES
+        url = "https://www.celestrak.com/NORAD/elements/tle-new.txt"
+        r = urllib.request.urlopen(url)
+        tle_file.write(r.read().decode('utf-8'))
     extractEQUiSatTLE()
 
 def get_ip_loc():
@@ -95,8 +99,10 @@ def extractEQUiSatTLE():
     with open(DEFAULT_TLE_FILE, 'r') as tle_file:        
         tles_str = tle_file.read()
         equisat_tle = re.search("EQUISAT(.*\n){3}", tles_str)        
-        if (equisat_tle == None):            
-            equisat_tle = re.search("ISS \(ZARYA\)(.*\n){3}", tles_str)            
+        if (equisat_tle == None):
+            equisat_tle=re.search("1998-067NY(.*\n){3}", tles_str)
+        if (equisat_tle == None):
+            equisat_tle = re.search("ISS \(ZARYA\)(.*\n){3}", tles_str)
         if (equisat_tle):
             with open("equisat-tle.txt", "w+") as equisat_tle_file:
                 equisat_tle_file.write(equisat_tle.group()[:-1]) 
