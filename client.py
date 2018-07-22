@@ -91,7 +91,10 @@ class PhoneClient:
         c.execute('INSERT INTO phones VALUES (?,?,?)', (number, lat, lon))
         conn.commit()
         conn.close()
-        message = client.messages.create(to=number,from_=gsw_num,body="Thanks for registering for EQUiSat pass notifications for (" + str(lat) + ", " + str(lon) + "). Reply with REMOVE at any time to unsubscribe.")
+        try:
+            message = client.messages.create(to=number,from_=gsw_num,body="Thanks for registering for EQUiSat pass notifications for (" + str(lat) + ", " + str(lon) + "). Reply with REMOVE at any time to unsubscribe.")
+        except Exception as e:
+            print("Error: " + str(e))
         return True
 
     def unregister_number(self, number, message):
@@ -102,7 +105,10 @@ class PhoneClient:
             c.execute('DELETE FROM phones WHERE number = ?', remove)
             conn.commit()
             conn.close()
-            client.messages.create(to=number,from_=gsw_num,body="You've been unsubscribed from SMS notifications.")
+            try:
+                client.messages.create(to=number,from_=gsw_num,body="You've been unsubscribed from SMS notifications.")
+            except Exception as e:
+                print("Error: " + str(e))
             return True        
         return False
 
@@ -121,7 +127,11 @@ class DatabaseMonitor:
         + "\nMax Altitude: " + '%.2f' % pass_info['max_alt'] + "°" \
         + "\nSet Time: " + str(datetime.utcfromtimestamp(pass_info['set_time']).replace(tzinfo=pytz.UTC).strftime(fmt)) \
         + "\nSet Azimuth: " + '%.2f' % pass_info['set_azimuth'] + "°"        
-        message = client.messages.create(to=number,from_=gsw_num,body=messageBody)
+        try:
+            message = client.messages.create(to=number,from_=gsw_num,body=messageBody)
+        except Exception as e:
+            print("Error: " + str(e))
+
 
     def test_search(self):
         self.search_database()
