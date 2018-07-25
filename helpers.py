@@ -100,8 +100,6 @@ def extractEQUiSatTLE():
         tles_str = tle_file.read()
         equisat_tle = re.search("EQUISAT(.*\n){3}", tles_str)        
         if (equisat_tle == None):
-            equisat_tle=re.search("1998-067PA(.*\n){3}", tles_str)
-        if (equisat_tle == None):
             equisat_tle = re.search("ISS \(ZARYA\)(.*\n){3}", tles_str)
         if (equisat_tle):
             with open("equisat-tle.txt", "w+") as equisat_tle_file:

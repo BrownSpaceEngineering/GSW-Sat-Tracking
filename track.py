@@ -37,7 +37,7 @@ import json
 import ephem
 from helpers import *
 
-DEFAULT_SAT = "1998-067PA"
+DEFAULT_SAT = "EQUISAT"
 now = ephem.now()
 class Tracker:
     _time = staticmethod(time)
