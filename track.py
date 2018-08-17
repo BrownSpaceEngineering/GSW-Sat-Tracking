@@ -142,7 +142,7 @@ class Observer:
         # 5  Set azimuth
         # date info: http://rhodesmill.org/pyephem/date
         # next_pass info:
-        # https://github.com/brandon-rhodes/pyephem/blob/592ecff661adb9c5cbed7437a23d705555d7ce57/libastro-3.7.7/riset_cir.c#L17        
+        # https://github.com/brandon-rhodes/pyephem/blob/592ecff661adb9c5cbed7437a23d705555d7ce57/libastro-3.7.7/riset_cir.c#L17
         d = OrderedDict([
             ('rise_time', ephem_to_unix(passData[0])),
             ('rise_azimuth', math.degrees(passData[1])),
@@ -151,16 +151,16 @@ class Observer:
             ('set_time', ephem_to_unix(passData[4])),
             ('set_azimuth', math.degrees(passData[5]))
         ])
-        
+
         return d
 
     def get_next_pass_data(self):
-        tle = get_TLE(self.sat)        
+        tle = get_TLE(self.sat)
         sat = ephem.readtle(tle[0], tle[1], tle[2])
-        obs = ephem.Observer()        
+        obs = ephem.Observer()
         lon, lat, el = self.loc
         obs.lon, obs.lat, obs.elevation = str(lon), str(lat), 0
-        passData = obs.next_pass(sat)    
+        passData = obs.next_pass(sat)
         return passData
 
 if __name__ == "__main__":

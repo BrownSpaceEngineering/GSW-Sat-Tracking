@@ -5,7 +5,7 @@ import helpers
 from flask import Flask, jsonify, send_from_directory, request
 from flask_cors import CORS
 import json
-from helpers import DEFAULT_TLE_FILE
+from helpers import DEFAULT_TLE_FILE, EQUISAT_TLE_FILE
 from werkzeug.routing import FloatConverter as BaseFloatConverter
 import requests
 from collections import OrderedDict
@@ -23,10 +23,10 @@ sat_not_found = "404 - Satellite Not Found"
 guide_path = './docs/index.html'
 ip_request_failed = "404 - Cannot make IP Location Request"
 
+SERVER_PORT = 80
 # tle file customization. Static file will not be auto-updated, default will be.
 USE_STATIC_TLE_FILE = False
 STATIC_TLE_FILE = "equisat-tle-static.txt"
-EQUISAT_TLE_FILE = "equisat-tle.txt"
 TLE_FILE = STATIC_TLE_FILE if USE_STATIC_TLE_FILE else DEFAULT_TLE_FILE
 
 # API User Guide
@@ -125,14 +125,14 @@ def az_el(lon, lat, alt, s):
     except KeyError:
         return sat_not_found
     except requests.exceptions.HTTPError:
-        return ip_request_failed 
-        
+        return ip_request_failed
+
 @api.route('/api/get_az_el/<float:lon>,<float:lat>,<float:alt>')
 def az_el_with_loc(lon, lat, alt):
     try:
         return track.Observer(loc = (lon, lat, alt), tle_file = TLE_FILE).get_az_el()
     except requests.exceptions.HTTPError:
-        return ip_request_failed 
+        return ip_request_failed
 
 @api.route('/api/get_az_el/<string:s>')
 def az_el_with_sat(s):
@@ -141,14 +141,14 @@ def az_el_with_sat(s):
     except KeyError:
     	return sat_not_found
     except requests.exceptions.HTTPError:
-        return ip_request_failed 
+        return ip_request_failed
 
 @api.route('/api/get_az_el')
 def az_el_default():
     try:
         return track.Observer(tle_file = TLE_FILE).get_az_el()
     except requests.exceptions.HTTPError:
-        return ip_request_failed 
+        return ip_request_failed
 
 @api.route('/api/get_next_pass/<string:s>/<float:lon>,<float:lat>,<float:alt>')
 def next_pass(lon, lat, alt, s):
@@ -158,7 +158,7 @@ def next_pass(lon, lat, alt, s):
     except KeyError:
         return sat_not_found
     except requests.exceptions.HTTPError:
-        return ip_request_failed 
+        return ip_request_failed
 
 @api.route('/api/get_next_pass/<float:lon>,<float:lat>,<float:alt>')
 def next_pass_with_loc(lon, lat, alt):
@@ -166,7 +166,7 @@ def next_pass_with_loc(lon, lat, alt):
         pass_info = track.Observer(loc = (lon, lat, alt), tle_file = TLE_FILE).get_next_pass()
         return json.dumps(pass_info)
     except requests.exceptions.HTTPError:
-        return ip_request_failed 
+        return ip_request_failed
 
 @api.route('/api/get_next_pass/<string:s>')
 def next_pass_with_sat(s):
@@ -184,7 +184,7 @@ def next_pass_default():
         pass_info = track.Observer(tle_file = TLE_FILE).get_next_pass()
         return json.dumps(pass_infos)
     except requests.exceptions.HTTPError:
-        return ip_request_failed 
+        return ip_request_failed
 
 @api.route('/api/number_exists/<string:number>')
 def number_exists(number):
@@ -204,7 +204,6 @@ def sms():
     message_body = request.form['Body']
     return json.dumps(OrderedDict([('success', client.PhoneClient().unregister_number(number, message_body))]))
 
-
 # Maual maintenance
 @api.route('/api/update')
 def update_tle():
@@ -213,6 +212,7 @@ def update_tle():
     return json.dumps({"updated_time": time})
 
 if __name__ == '__main__':
+    helpers.update_TLE() # perform first update
     helpers.start_update_tle_daemon()
     client.DatabaseMonitor().start_database_monitor()
-    api.run(debug = False, host = '0.0.0.0', port = 80)
+    api.run(debug = False, host = '0.0.0.0', port = SERVER_PORT)
