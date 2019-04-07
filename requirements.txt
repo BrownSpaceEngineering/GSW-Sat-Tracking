@@ -12,3 +12,6 @@ pyorbital==1.2.0
 requests>=2.20.0
 urllib3==1.22
 Werkzeug==0.14.1
+twilio==6.16.1
+portalocker==1.2.1
+flask_cors==3.0.6
