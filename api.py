@@ -69,8 +69,12 @@ def get_next_passes(s, length, lon, lat, alt):
     dtime = datetime.datetime.now()
     pass_times = track.Tracker(s, tle_file = TLE_FILE).get_next_passes(dtime, length, lon, lat, alt)
     posix_times = []
-    for dtime in pass_times:
-        posix_times.append(float(dtime.strftime("%s.%f")))
+    for dtimes in pass_times:
+        posix_times.append({
+            'rise': dtimes[0].timestamp(),
+            'set': dtimes[1].timestamp(),
+            'max': dtimes[2].timestamp()
+        })
     return jsonify(posix_times)
 
 @api.route('/api/get_velocity_vector/<string:s>')
