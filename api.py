@@ -69,8 +69,12 @@ def get_next_passes(s, length, lon, lat, alt):
     dtime = datetime.datetime.now()
     pass_times = track.Tracker(s, tle_file = TLE_FILE).get_next_passes(dtime, length, lon, lat, alt)
     posix_times = []
-    for dtime in pass_times:
-        posix_times.append(float(dtime.strftime("%s.%f")))
+    for dtimes in pass_times:
+        posix_times.append({
+            'rise': dtimes[0].timestamp(),
+            'set': dtimes[1].timestamp(),
+            'max': dtimes[2].timestamp()
+        })
     return jsonify(posix_times)
 
 @api.route('/api/get_velocity_vector/<string:s>')
@@ -79,6 +83,13 @@ def velocity_vector(s):
     	return track.Tracker(s, tle_file = TLE_FILE).get_velocity_vector()
     except KeyError:
     	return sat_not_found
+
+@api.route('/api/get_velocity_vector/<string:s>/<float:hour>,<float:minute>,<float:second>')
+def velocity_vector_with_time(s, hour, minute, second):
+    try:
+        return track.Tracker(s).get_velocity_vector(time=datetime.time(hour, minute, second))
+    except KeyError:
+        return sat_not_found
 
 @api.route('/api/get_velocity_vector')
 def velocity_vector_default():
@@ -95,10 +106,24 @@ def velocity(s):
     except KeyError:
         return sat_not_found
 
+@api.route('/api/get_velocity/<string:s>/<float:hour>,<float:minute>,<float:second>')
+def velocity_with_time(s, hour, minute, second):
+    try:
+        return track.Tracker(s).get_velocity(time=datetime.time(hour,minute,second))
+    except KeyError:
+        return sat_not_found
+
 @api.route('/api/get_lonlatalt/<string:s>')
 def lonlatalt(s):
     try:
         return track.Tracker(s, tle_file = TLE_FILE).get_lonlatalt()
+    except KeyError:
+        return sat_not_found
+
+@api.route('/api/get_lonlatalt/<string:s>/<float:hour>,<float:minute>,<float:second>')
+def lonlatalt_with_time(s, hour, minute, second):
+    try:
+        return track.Tracker(s).get_lonlatalt(time=datetime.time(hour,minute,second))
     except KeyError:
         return sat_not_found
 
@@ -126,6 +151,13 @@ def az_el(lon, lat, alt, s):
         return sat_not_found
     except requests.exceptions.HTTPError:
         return ip_request_failed
+
+@api.route('/api/get_az_el/<string:s>/<float:lon>,<float:lat>,<float:alt>/<float:hour>,<float:minute>,<float:second>')
+def az_el_with_time(lon, lat, alt, s, hour, minute, second):
+    try:
+        return track.Observer(sat = s, loc = (lon, lat, alt)).get_az_el(time=datetime.time(hour, minute, second))
+    except KeyError:
+        return sat_not_found
 
 @api.route('/api/get_az_el/<float:lon>,<float:lat>,<float:alt>')
 def az_el_with_loc(lon, lat, alt):
